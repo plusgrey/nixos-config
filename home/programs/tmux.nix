@@ -1,0 +1,197 @@
+{ config, pkgs, ... }:
+
+let
+  dotfilesPath = "/home/jh/dotfiles";
+in
+{
+  programs.tmux = {
+    enable = true;
+    
+    # 基础设置
+    clock24 = true;
+    keyMode = "vi";
+    mouse = true;
+    baseIndex = 1;
+    escapeTime = 0;
+    historyLimit = 10000;
+    terminal = "tmux-256color";
+    
+    # 前缀键
+    prefix = "C-b";
+    
+    # 插件
+    plugins = with pkgs.tmuxPlugins; [
+      sensible
+      yank
+      {
+        plugin = resurrect;
+        extraConfig = ''
+          set -g @resurrect-capture-pane-contents 'on'
+          set -g @resurrect-strategy-nvim 'session'
+        '';
+      }
+      {
+        plugin = continuum;
+        extraConfig = ''
+          set -g @continuum-restore 'on'
+          set -g @continuum-save-interval '15'
+        '';
+      }
+    ];
+    
+    # 额外配置 - 使用你的 dotfiles 中的完整配置
+    extraConfig = ''
+      # -- general
+      setw -g xterm-keys on
+      set-window-option -g xterm-keys on
+      set -sg repeat-time 300
+      set -s focus-events on
+      set -s extended-keys on
+      set -as terminal-features 'xterm*:extkeys'
+      set -sg exit-empty on
+      set -g detach-on-destroy off
+      
+      set -q -g status-utf8 on
+      setw -q -g utf8 on
+      
+      set -g visual-activity off
+      setw -g monitor-activity off
+      setw -g monitor-bell off
+      
+      # Hooks
+      set-hook -g pane-focus-in "run -b 'bash ~/.config/tmux/fzf_panes.tmux update_mru_pane_ids'"
+      
+      # reload configuration
+      bind C-r source-file ~/.tmux.conf \; display '~/.tmux.conf sourced'
+      
+      set -ga update-environment '\
+      DISPLAY DBUS_SESSION_BUS_ADDRESS \
+      QT_IM_MODULE QT_QPA_PLATFORMTHEME \
+      SESSION_MANAGER \
+      XDG_CONFIG_HOME XDG_CACHE_HOME XDG_DATA_HOME\
+      XDG_MENU_PREFIX XDG_RUNTIME_DIR XDG_SESSION_CLASS \
+      XDG_SESSION_DESKTOP XDG_SESSION_TYPE XDG_CURRENT_DESKTOP \
+      XMODIFIERS \
+      FZF_DEFAULT_OPTS \
+      TMUX_THEME_COLOR \
+      '
+      
+      # -- display
+      setw -g pane-base-index 1
+      setw -g automatic-rename on
+      set -g renumber-windows on
+      set -g set-titles on
+      set -g display-panes-time 2000
+      set -g display-time 2000
+      
+      # -- navigation
+      bind C-c new-session
+      bind -n M-S run-shell "~/.config/tmux/scripts/new_session.sh"
+      bind -n M-O break-pane
+      
+      # window management
+      bind -n M-o new-window -c "#{pane_current_path}"
+      bind -n M-Q kill-pane
+      bind . command-prompt -p "Rename session to:" "run-shell \"~/.config/tmux/scripts/rename_session_prompt.sh '%%'\""
+      unbind ,
+      bind , command-prompt -p "Rename window:" "rename-window '%%'"
+      
+      # window navigation
+      unbind n
+      unbind p
+      bind -r C-p previous-window
+      bind -r C-n next-window
+      
+      # Alt + Number to select window
+      bind -n M-1 select-window -t 1
+      bind -n M-2 select-window -t 2
+      bind -n M-3 select-window -t 3
+      bind -n M-4 select-window -t 4
+      bind -n M-5 select-window -t 5
+      bind -n M-6 select-window -t 6
+      bind -n M-7 select-window -t 7
+      bind -n M-8 select-window -t 8
+      bind -n M-9 select-window -t 9
+      
+      # -- Splits (Vim Style)
+      bind k split-window -vb -c "#{pane_current_path}"
+      bind j split-window -v -c "#{pane_current_path}"
+      bind h split-window -hb -c "#{pane_current_path}"
+      bind l split-window -h -c "#{pane_current_path}"
+      
+      bind -n M-f resize-pane -Z
+      
+      # paste from system clipboard
+      bind -n C-S-v run -b "~/.config/tmux/scripts/paste_from_clipboard.sh"
+      bind -n M-V run -b "~/.config/tmux/scripts/paste_from_clipboard.sh"
+      
+      # -- Pane Navigation (Vim Style: Alt + h/j/k/l)
+      bind -n M-h select-pane -L
+      bind -n M-j select-pane -D
+      bind -n M-k select-pane -U
+      bind -n M-l select-pane -R
+      
+      bind > swap-pane -D
+      bind < swap-pane -U
+      bind | swap-pane
+      
+      bind Space run-shell "~/.config/tmux/scripts/toggle_orientation.sh"
+      
+      bind W choose-tree -Z
+      bind S choose-tree 'move-pane -v -s "%%"'
+      bind V choose-tree 'move-pane -h -s "%%"'
+      
+      # -- Pane Resizing (Vim Style: Alt + Shift + H/J/K/L)
+      bind -n M-H resize-pane -L 3
+      bind -n M-J resize-pane -D 3
+      bind -n M-K resize-pane -U 3
+      bind -n M-L resize-pane -R 3
+      
+      set -g status-keys emacs
+      set -g mode-keys vi
+      
+      bind -n M-v copy-mode
+      
+      # -- Copy Mode (Vim Standard)
+      bind -T copy-mode-vi v send-keys -X begin-selection
+      bind -T copy-mode-vi C-v send-keys -X rectangle-toggle
+      bind -T copy-mode-vi y send-keys -X copy-pipe-and-cancel "~/.config/tmux/scripts/copy_to_clipboard.sh"
+      
+      bind b list-buffers
+      bind p paste-buffer
+      
+      # Swap Window position
+      bind -n M-< swap-window -d -t :-1
+      bind -n M-> swap-window -d -t :+1
+      
+      # -- theme
+      run-shell "~/.config/tmux/scripts/update_theme_color.sh"
+      setw -g pane-border-status off
+      set -g pane-active-border-style fg='#{@theme_color}'
+      set -g pane-border-style fg=colour244
+      
+      # windows
+      set -g status-justify 'left'
+      set -g status-left-length 90
+      set -g status-right-length 140
+      setw -g window-status-separator '''
+      
+      # default statusbar colors
+      set -g status-bg black
+      setw -g window-status-format '#[fg=#{?client_prefix,red,#c5c8c6}] #W '
+      setw -g window-status-current-format '#[fg=#{?client_prefix,red,#{@theme_color}},bold] #W '
+      setw -g window-status-activity-style bg=black
+      setw -g window-status-bell-style bg=black
+      
+      set-option -g status-left "#(~/.config/tmux/tmux-status/left.sh \"#{session_id}\" \"#{session_name}\")   "
+      set-option -g status-right "#(~/.config/tmux/tmux-status/right.sh)"
+      
+      # True color support
+      set -as terminal-features ",*256col*:RGB"
+      set -as terminal-overrides ",*256col*:Tc"
+    '';
+  };
+  
+  # 链接 tmux 配置目录中的脚本和辅助文件
+  xdg.configFile."tmux".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/.config/tmux";
+}
