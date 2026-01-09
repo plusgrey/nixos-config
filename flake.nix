@@ -8,11 +8,6 @@
     # 稳定分支，用于某些需要稳定版本的软件
     nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.05";
 
-    home-manager = {
-      url = "github:nix-community/home-manager";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    
     # Niri Flake: 获取最新版 Niri 合成器
     niri.url = "github:sodiboo/niri-flake";
 
@@ -23,7 +18,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, nixpkgs-stable, home-manager, niri, ... }@inputs: 
+  outputs = { self, nixpkgs, nixpkgs-stable, niri, ... }@inputs: 
   let
     system = "x86_64-linux";
     
@@ -43,14 +38,6 @@
         };
         modules = [
           ./hosts/default/configuration.nix
-          
-          home-manager.nixosModules.home-manager
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.users.jh = import ./home/default.nix;
-            home-manager.extraSpecialArgs = { inherit inputs pkgs-stable; };
-          }
         ];
       };
     };

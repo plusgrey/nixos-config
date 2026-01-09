@@ -12,6 +12,56 @@ in
     inputs.niri.nixosModules.niri
   ];
 
+  # --- Dotfiles: 不使用 Home Manager，直接在激活阶段创建软链接 ---
+  # 约定：你的 dotfiles 在 /home/jh/dotfiles
+  # 说明：如果目标路径已存在且不是软链接，会先移动成 .bak（重复时追加时间戳）。
+  system.activationScripts.dotfilesSymlinks.text = ''
+    set -euo pipefail
+
+    user="jh"
+    homeDir="/home/$user"
+    dotfilesDir="$homeDir/dotfiles"
+
+    if [ ! -d "$dotfilesDir" ]; then
+      echo "[dotfiles] skip: $dotfilesDir not found"
+      exit 0
+    fi
+
+    backup_and_link() {
+      local target="$1"
+      local source="$2"
+
+      if [ -e "$target" ] && [ ! -L "$target" ]; then
+        local backup="$target.bak"
+        if [ -e "$backup" ] || [ -L "$backup" ]; then
+          backup="$target.bak.$(date +%s)"
+        fi
+        echo "[dotfiles] backup: $target -> $backup"
+        mv "$target" "$backup"
+      fi
+
+      mkdir -p "$(dirname "$target")"
+      ln -sfn "$source" "$target"
+    }
+
+    # shell
+    backup_and_link "$homeDir/.zshrc"  "$dotfilesDir/.zshrc"
+    backup_and_link "$homeDir/.zimrc"  "$dotfilesDir/.zimrc"
+
+    # git (如果你用 dotfiles 管理 ~/.gitconfig)
+    if [ -e "$dotfilesDir/.gitconfig" ]; then
+      backup_and_link "$homeDir/.gitconfig" "$dotfilesDir/.gitconfig"
+    fi
+
+    # configs under ~/.config
+    backup_and_link "$homeDir/.config/nvim"    "$dotfilesDir/.config/nvim"
+    backup_and_link "$homeDir/.config/tmux"    "$dotfilesDir/.config/tmux"
+    backup_and_link "$homeDir/.config/yazi"    "$dotfilesDir/.config/yazi"
+    backup_and_link "$homeDir/.config/wezterm" "$dotfilesDir/.config/wezterm"
+
+    chown -hR "$user:users" "$homeDir/.config" 2>/dev/null || true
+  '';
+
   # --- 1. 启动与内核 ---
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;

@@ -31,8 +31,5 @@
     };
   };
 
-  # 允许 home-manager 管理自己
-  programs.home-manager.enable = true;
-
   home.stateVersion = "25.11";
 }
