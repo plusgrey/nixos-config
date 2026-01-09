@@ -7,16 +7,16 @@
     userEmail = "plusgrey@yahoo.com";
     
     # 启用 delta (更好的 diff 显示)
-    delta = {
-      enable = true;
-      options = {
-        navigate = true;
-        light = false;
-        side-by-side = true;
-        line-numbers = true;
-        syntax-theme = "Dracula";
-      };
-    };
+    # delta = {
+    #   enable = true;
+    #   options = {
+    #     navigate = true;
+    #     light = false;
+    #     side-by-side = true;
+    #     line-numbers = true;
+    #     syntax-theme = "Dracula";
+    #   };
+    # };
     
     extraConfig = {
       init.defaultBranch = "main";
@@ -56,7 +56,7 @@
     };
     
     # Git 别名
-    aliases = {
+    settings.aliases = {
       st = "status";
       co = "checkout";
       br = "branch";

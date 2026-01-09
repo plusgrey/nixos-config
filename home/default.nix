@@ -172,7 +172,7 @@ in
     cliphist.enable = true;
     
     # 通知服务 (如果 mako 没有作为系统服务运行)
-    mako = {
+    mako.settings = {
       enable = true;
       defaultTimeout = 5000;
       borderRadius = 8;
