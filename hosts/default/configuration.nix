@@ -248,7 +248,7 @@ in
     evolution-data-server
 
     # 输入法配置 GUI
-    fcitx5-configtool
+    qt6Packages.fcitx5-configtool
 
     # 文件/媒体
     nautilus
