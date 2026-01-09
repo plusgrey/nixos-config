@@ -5,7 +5,7 @@ let
 in
 {
   programs.tmux = {
-    enable = true;
+    enable = false;
     
     # 基础设置
     clock24 = true;

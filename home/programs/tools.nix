@@ -35,24 +35,6 @@ in
   xdg.configFile."yazi/theme-dark.toml".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/.config/yazi/theme-dark.toml";
   xdg.configFile."yazi/theme-light.toml".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/.config/yazi/theme-light.toml";
   
-  # Btop 系统监控
-  programs.btop = {
-    enable = true;
-    settings = {
-      color_theme = "Default";
-      theme_background = false;
-      truecolor = true;
-      vim_keys = true;
-      rounded_corners = true;
-      graph_symbol = "braille";
-      update_ms = 2000;
-      proc_sorting = "memory";
-      proc_tree = false;
-      proc_colors = true;
-      proc_gradient = true;
-    };
-  };
-  
   # Bat (更好的 cat)
   programs.bat = {
     enable = true;
