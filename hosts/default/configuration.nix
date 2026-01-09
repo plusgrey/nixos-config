@@ -5,6 +5,21 @@ let
   noctaliaShellPkg =
     if pkgs ? noctalia-shell then pkgs.noctalia-shell
     else inputs.noctalia-shell.packages.${pkgs.system}.default;
+
+  # 让 Chrome 在 Wayland 下也能正常使用输入法（KDE Wayland 常见问题）。
+  # 说明：用脚本包装以注入启动参数，不依赖桌面文件或手动改快捷方式。
+  googleChromeIme = pkgs.writeShellScriptBin "google-chrome" ''
+    set -e
+    chromeBin="${pkgs.google-chrome}/bin/google-chrome-stable"
+    if [ ! -x "$chromeBin" ]; then
+      chromeBin="${pkgs.google-chrome}/bin/google-chrome"
+    fi
+
+    exec "$chromeBin" \
+      --enable-wayland-ime \
+      --ozone-platform-hint=auto \
+      "$@"
+  '';
 in
 {
   imports = [
@@ -60,6 +75,12 @@ in
     backup_and_link "$homeDir/.config/wezterm" "$dotfilesDir/.config/wezterm"
     backup_and_link "$homeDir/.config/niri"     "$dotfilesDir/.config/niri"
     backup_and_link "$homeDir/.config/noctalia" "$dotfilesDir/.config/noctalia"
+
+    # fcitx5/rime 用户词库与方案（建议用 dotfiles 管理，比如放入 rime-ice）
+    # 期望结构：~/dotfiles/.local/share/fcitx5/rime
+    if [ -d "$dotfilesDir/.local/share/fcitx5/rime" ]; then
+      backup_and_link "$homeDir/.local/share/fcitx5/rime" "$dotfilesDir/.local/share/fcitx5/rime"
+    fi
     chown -hR "$user:users" "$homeDir/.config" 2>/dev/null || true
   '';
 
@@ -201,7 +222,7 @@ in
 
     # 终端/桌面应用（配置由 dotfiles 自己管）
     wezterm
-    google-chrome
+    googleChromeIme
     vscode
     insomnia
 
@@ -215,6 +236,19 @@ in
 
     # Noctalia dotfiles 依赖：提供 `qs` 命令（niri/config.kdl 与 noctalia/settings.json 会调用）
     quickshell
+    # Noctalia 文档里的必需依赖
+    gpu-screen-recorder
+    brightnessctl
+
+    # Noctalia 常用可选依赖（不强制，但很多模块会用到）
+    cliphist
+    matugen
+    cava
+    wlsunset
+    evolution-data-server
+
+    # 输入法配置 GUI
+    fcitx5-configtool
 
     # 文件/媒体
     nautilus
@@ -382,6 +416,16 @@ in
     GTK_IM_MODULE = "fcitx";
     QT_IM_MODULE = "fcitx";
     XMODIFIERS = "@im=fcitx";
+    SDL_IM_MODULE = "fcitx";
+  };
+
+  # Wayland Portal（让 Wayland 应用与桌面集成更稳定；Noctalia 部分功能也会用到）
+  xdg.portal = {
+    enable = true;
+    wlr.enable = true;
+    extraPortals = with pkgs; [
+      xdg-desktop-portal-gtk
+    ];
   };
 
   # --- 19. Nix 设置 ---
