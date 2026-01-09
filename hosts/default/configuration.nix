@@ -6,6 +6,12 @@ let
     if pkgs ? noctalia-shell then pkgs.noctalia-shell
     else inputs.noctalia-shell.packages.${pkgs.system}.default;
 
+  # Rime 方案数据（雾凇拼音 / rime-ice 等）。
+  # 某些渠道/版本的 nixpkgs 里可能没有这些属性，所以这里做了兼容。
+  rimeDataPkg = if builtins.hasAttr "rime-data" pkgs then pkgs."rime-data" else null;
+  rimeIcePkg = if builtins.hasAttr "rime-ice" pkgs then pkgs."rime-ice" else null;
+  rimeSchemaPkgs = builtins.filter (p: p != null) [ rimeDataPkg rimeIcePkg ];
+
   # 让 Chrome 在 Wayland 下也能正常使用输入法（KDE Wayland 常见问题）。
   # 说明：用 symlinkJoin + wrapProgram 保留 .desktop 文件（否则 App Launcher 扫不到 Chrome）。
   googleChromeIme = pkgs.symlinkJoin {
@@ -185,7 +191,7 @@ in
   };
 
   # --- 8. 系统级开发环境 & 工具 ---
-  environment.systemPackages = with pkgs; [
+  environment.systemPackages = (with pkgs; [
     # 核心工具
     git
     wget
@@ -319,7 +325,7 @@ in
     
     # 手柄支持
     antimicrox          # 手柄映射
-  ];
+  ]) ++ rimeSchemaPkgs;
 
   # --- 9. Zsh ---
   programs.zsh = {
