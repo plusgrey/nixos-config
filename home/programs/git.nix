@@ -3,8 +3,8 @@
 {
   programs.git = {
     enable = true;
-    userName = "plusgrey";
-    userEmail = "plusgrey@yahoo.com";
+    settings.userName = "plusgrey";
+    settings.userEmail = "plusgrey@yahoo.com";
     
     # 启用 delta (更好的 diff 显示)
     # delta = {
@@ -18,7 +18,7 @@
     #   };
     # };
     
-    extraConfig = {
+    settings = {
       init.defaultBranch = "main";
       pull.rebase = true;
       push.autoSetupRemote = true;
