@@ -7,19 +7,19 @@ let
     else inputs.noctalia-shell.packages.${pkgs.system}.default;
 
   # 让 Chrome 在 Wayland 下也能正常使用输入法（KDE Wayland 常见问题）。
-  # 说明：用脚本包装以注入启动参数，不依赖桌面文件或手动改快捷方式。
-  googleChromeIme = pkgs.writeShellScriptBin "google-chrome" ''
-    set -e
-    chromeBin="${pkgs.google-chrome}/bin/google-chrome-stable"
-    if [ ! -x "$chromeBin" ]; then
-      chromeBin="${pkgs.google-chrome}/bin/google-chrome"
-    fi
-
-    exec "$chromeBin" \
-      --enable-wayland-ime \
-      --ozone-platform-hint=auto \
-      "$@"
-  '';
+  # 说明：用 symlinkJoin + wrapProgram 保留 .desktop 文件（否则 App Launcher 扫不到 Chrome）。
+  googleChromeIme = pkgs.symlinkJoin {
+    name = "google-chrome-ime";
+    paths = [ pkgs.google-chrome ];
+    nativeBuildInputs = [ pkgs.makeWrapper ];
+    postBuild = ''
+      for bin in "$out/bin/google-chrome-stable" "$out/bin/google-chrome"; do
+        if [ -x "$bin" ]; then
+          wrapProgram "$bin" --add-flags "--enable-wayland-ime --ozone-platform-hint=auto"
+        fi
+      done
+    '';
+  };
 
   # 兼容：有些配置会调用 `qs ...`，但不同打包方式可能只有 `quickshell`。
   # 这个 wrapper 会优先转发给 quickshell 自带的 `qs`，否则退回到 `quickshell`。
@@ -433,6 +433,28 @@ in
       source-han-serif
     ];
   };
+
+  # --- 图标主题（Papirus）---
+  # GTK 会从 xdg settings.ini 读取默认 icon theme。
+  environment.etc."xdg/gtk-3.0/settings.ini".text = ''
+    [Settings]
+    gtk-icon-theme-name=Papirus-Dark
+  '';
+  environment.etc."xdg/gtk-4.0/settings.ini".text = ''
+    [Settings]
+    gtk-icon-theme-name=Papirus-Dark
+  '';
+
+  # Qt 图标主题：qt6ct/qt5ct 会读取这些默认配置。
+  # 注意：如果你在 ~/.config/qt6ct/qt6ct.conf 或 ~/.config/qt5ct/qt5ct.conf 里有本地配置，会覆盖这里。
+  environment.etc."xdg/qt6ct/qt6ct.conf".text = ''
+    [Appearance]
+    icon_theme=Papirus-Dark
+  '';
+  environment.etc."xdg/qt5ct/qt5ct.conf".text = ''
+    [Appearance]
+    icon_theme=Papirus-Dark
+  '';
 
   # --- 18. 环境变量 ---
   environment.sessionVariables = {
