@@ -24,35 +24,23 @@
       push.autoSetupRemote = true;
       
       # 更好的 merge 体验
-      merge = {
-        conflictstyle = "diff3";
-      };
+      merge.conflictstyle = "diff3";
       
-      diff = {
-        colorMoved = "default";
-      };
+      diff.colorMoved = "default";
       
       # URL 简写
-      url = {
-        "git@github.com:" = {
-          insteadOf = "gh:";
-        };
-      };
+      url."git@github.com:".insteadOf = "gh:";
       
       # 凭据存储
       credential.helper = "store";
       
       # 核心设置
-      core = {
-        editor = "nvim";
-        autocrlf = "input";
-        whitespace = "fix,-indent-with-non-tab,trailing-space,cr-at-eol";
-      };
+      core.editor = "nvim";
+      core.autocrlf = "input";
+      core.whitespace = "fix,-indent-with-non-tab,trailing-space,cr-at-eol";
       
       # 颜色设置
-      color = {
-        ui = "auto";
-      };
+      color.ui = "auto";
     };
     
     # Git 别名

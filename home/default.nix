@@ -1,6 +1,15 @@
 { config, pkgs, ... }:
 
 {
+  imports = [
+    ./programs/git.nix
+    ./programs/neovim.nix
+    ./programs/shell.nix
+    ./programs/tmux.nix
+    ./programs/tools.nix
+    ./programs/wezterm.nix
+  ];
+
   # 目标：dotfiles 由你手动管理（额外文件夹 + 自己的安装/链接脚本），
   # Home Manager 不再生成/链接任何应用配置文件，仅保留必要的 home 元信息。
 
