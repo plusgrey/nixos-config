@@ -3,7 +3,7 @@
 let
   # ！！！注意：这是你 dotfiles 在物理磁盘上的绝对路径
   # 安装完系统后，请确保在这个路径 git clone 了你的 repo
-  dotfilesPath = "/home/jh/dotfiles";
+  dotfilesPath = "${config.home.homeDirectory}/dotfiles";
 in
 {
   # 导入模块化配置
@@ -105,7 +105,7 @@ in
     
     # 其他实用工具
     nwg-look              # GTK 主题设置
-    qt6ct                 # Qt6 主题设置
+    qt6Packages.qt6ct     # Qt6 主题设置
     papirus-icon-theme    # 图标主题
   ];
 
