@@ -36,7 +36,7 @@ in
       
       # Debug adapters
       lldb
-      debugpy
+      python3Packages.debugpy  # Python debugger
       delve  # Go debugger
 
       

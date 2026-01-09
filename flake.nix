@@ -18,7 +18,7 @@
 
     # Noctalia Shell (Wayland 状态栏)
     noctalia-shell = {
-      url = "github:Noctalia-Studio/noctalia-shell";
+      url = "github:noctalia-dev/noctalia-shell";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };

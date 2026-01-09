@@ -67,10 +67,10 @@
     type = "fcitx5";
     fcitx5.addons = with pkgs; [
       fcitx5-gtk
-      fcitx5-qt
-      fcitx5-chinese-addons # 包含 pinyin, table 等
-      fcitx5-rime           # Rime 输入法
-      fcitx5-nord           # 主题，可选
+      qt6Packages.fcitx5-qt  # Qt6 支持
+      qt6Packages.fcitx5-chinese-addons  # 包含 pinyin, table 等
+      fcitx5-rime            # Rime 输入法
+      fcitx5-nord
     ];
     fcitx5.waylandFrontend = true;
   };
@@ -128,15 +128,36 @@
     
     # 终端工具
     # starship   # 提示符 (已在 dotfiles 中使用 zim 自带主题)
-    zellij     # 终端复用器 (tmux 替代方案)
+    tmux
     
     # Noctalia Shell (如果在 nixpkgs 中可用)
-    # noctalia-shell
+    noctalia-shell
     
     # 其他实用工具
     mediainfo
     imagemagick
     ffmpeg
+    
+    # --- 游戏工具 ---
+    # Steam 相关
+    steam-run           # 运行非 Steam 游戏
+    protontricks        # Proton 配置工具
+    
+    # 游戏启动器
+    lutris              # 游戏启动器
+    heroic              # Epic/GOG 启动器
+    prismlauncher       # Minecraft 启动器
+    
+    # 性能监控
+    mangohud            # 游戏内性能监控 OSD
+    goverlay            # MangoHud 配置工具
+    
+    # Wine/Proton
+    wine64              # Wine 64位
+    winetricks          # Wine 配置工具
+    
+    # 手柄支持
+    antimicrox          # 手柄映射
   ];
 
   # --- 9. Zsh ---
@@ -176,30 +197,6 @@
     dedicatedServer.openFirewall = true; # Steam 专用服务器
   };
   programs.gamemode.enable = true;
-  
-  # 额外游戏工具
-  environment.systemPackages = with pkgs; [
-    # Steam 相关
-    steam-run           # 运行非 Steam 游戏
-    protontricks        # Proton 配置工具
-    winetricks          # Wine 配置工具
-    
-    # 游戏启动器
-    lutris              # 游戏启动器
-    heroic              # Epic/GOG 启动器
-    prismlauncher       # Minecraft 启动器
-    
-    # 性能监控
-    mangohud            # 游戏内性能监控 OSD
-    goverlay            # MangoHud 配置工具
-    
-    # Wine/Proton
-    wine64              # Wine 64位
-    winetricks          # Wine 配置
-    
-    # 手柄支持
-    antimicrox          # 手柄映射
-  ];
 
   # --- 12. 音频 (PipeWire) ---
   services.pipewire = {
@@ -253,7 +250,7 @@
       noto-fonts
       noto-fonts-cjk-sans
       noto-fonts-cjk-serif
-      noto-fonts-emoji
+      noto-fonts-color-emoji
       nerd-fonts.jetbrains-mono
       nerd-fonts.fira-code
       nerd-fonts.meslo-lg

@@ -68,14 +68,7 @@ in
     # 浏览器
     google-chrome
     
-    # 字体 (Nix 下声明安装)
-    nerd-fonts.jetbrains-mono
-    nerd-fonts.meslo-lg
-    nerd-fonts.fira-code
-    source-han-sans       # 思源黑体 (中文)
-    source-han-serif      # 思源宋体
-    noto-fonts-emoji      # 谷歌 Noto Emoji 字体
-    noto-fonts-cjk-sans   # 谷歌 Noto CJK 字体
+    # 字体已在 configuration.nix 系统级配置中安装
 
     # Wayland 工具
     wl-clipboard          # Wayland 剪切板工具 (Neovim 依赖)
