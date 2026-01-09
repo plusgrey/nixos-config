@@ -324,9 +324,10 @@ in
   # --- 9. Zsh ---
   programs.zsh = {
     enable = true;
-    enableCompletion = true;
-    autosuggestions.enable = true;
-    syntaxHighlighting.enable = true;
+    # completion / autosuggestions / highlighting 交给 Zim 管理，避免重复初始化导致警告。
+    enableCompletion = false;
+    autosuggestions.enable = false;
+    syntaxHighlighting.enable = false;
   };
 
   # 某些程序/配置会硬编码 /bin/zsh（NixOS 默认没有 /bin）。
@@ -444,6 +445,9 @@ in
     QT_IM_MODULE = "fcitx";
     XMODIFIERS = "@im=fcitx";
     SDL_IM_MODULE = "fcitx";
+
+    # 优先使用简体中文翻译（避免某些组件默认落到繁体翻译）
+    LANGUAGE = "zh_CN:en_US";
   };
 
   # Wayland Portal（让 Wayland 应用与桌面集成更稳定；Noctalia 部分功能也会用到）
