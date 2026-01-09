@@ -1,7 +1,7 @@
 { config, pkgs, ... }:
 
 let
-  dotfilesPath = "/home/jh/dotfiles";
+  dotfilesPath = "${config.home.homeDirectory}/dotfiles";
 in
 {
   # Zsh - 使用 Zim Framework

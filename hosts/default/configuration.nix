@@ -53,13 +53,6 @@
   # XWayland (用于 X11 应用兼容)
   programs.xwayland.enable = true;
 
-  # --- 5. Noctalia Shell (Wayland 状态栏/启动器) ---
-  # 注意: noctalia-shell 目前需要从 flake 或手动安装
-  # 如果 flake 中有定义，可以直接使用:
-  # environment.systemPackages = [ inputs.noctalia-shell.packages.${pkgs.system}.default ];
-  
-  # 或者使用 overlay 方式 (需要确认 noctalia-shell flake 的输出格式)
-
   # --- 6. 输入法 (Fcitx5) ---
   # 系统级启用，保证在任何地方都能调起守护进程
   i18n.inputMethod = {
@@ -110,9 +103,7 @@
     
     # 系统监控
     btop
-    htop
     fastfetch
-    neofetch
     
     # 网络工具
     inetutils
@@ -123,7 +114,7 @@
     ntfs3g
     exfat
     
-    # Pixi (你的核心包管理器)
+    # Pixi 
     pixi
     
     # 终端工具
@@ -144,8 +135,8 @@
     protontricks        # Proton 配置工具
     
     # 游戏启动器
-    lutris              # 游戏启动器
-    heroic              # Epic/GOG 启动器
+    # lutris              # 游戏启动器
+    # heroic              # Epic/GOG 启动器
     prismlauncher       # Minecraft 启动器
     
     # 性能监控

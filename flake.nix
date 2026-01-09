@@ -23,7 +23,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, nixpkgs-stable, home-manager, niri, noctalia-shell, ... }@inputs: 
+  outputs = { self, nixpkgs, nixpkgs-stable, home-manager, niri, ... }@inputs: 
   let
     system = "x86_64-linux";
     

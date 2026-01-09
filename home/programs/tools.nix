@@ -1,7 +1,7 @@
 { config, pkgs, ... }:
 
 let
-  dotfilesPath = "/home/jh/dotfiles";
+  dotfilesPath = "${config.home.homeDirectory}/dotfiles";
 in
 {
   # Yazi 文件管理器
@@ -92,7 +92,6 @@ in
     jq          # JSON 处理
     yq          # YAML 处理
     tree        # 目录树
-    htop        # 进程监控
     ncdu        # 磁盘使用分析
     tldr        # 简化的 man pages
     trash-cli   # 安全删除
