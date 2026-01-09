@@ -3,8 +3,8 @@
 {
   programs.git = {
     enable = true;
-    settings.userName = "plusgrey";
-    settings.userEmail = "plusgrey@yahoo.com";
+    userName = "plusgrey";
+    userEmail = "plusgrey@yahoo.com";
     
     # 启用 delta (更好的 diff 显示)
     # delta = {
@@ -18,7 +18,7 @@
     #   };
     # };
     
-    settings = {
+    extraConfig = {
       init.defaultBranch = "main";
       pull.rebase = true;
       push.autoSetupRemote = true;
@@ -44,7 +44,7 @@
     };
     
     # Git 别名
-    settings.aliases = {
+    aliases = {
       st = "status";
       co = "checkout";
       br = "branch";
