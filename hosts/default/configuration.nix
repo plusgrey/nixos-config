@@ -73,6 +73,11 @@ in
     backup_and_link "$homeDir/.zshrc"  "$dotfilesDir/.zshrc"
     backup_and_link "$homeDir/.zimrc"  "$dotfilesDir/.zimrc"
 
+    # tmux
+    if [ -e "$dotfilesDir/.tmux.conf" ]; then
+      backup_and_link "$homeDir/.tmux.conf" "$dotfilesDir/.tmux.conf"
+    fi
+
     # git (如果你用 dotfiles 管理 ~/.gitconfig)
     if [ -e "$dotfilesDir/.gitconfig" ]; then
       backup_and_link "$homeDir/.gitconfig" "$dotfilesDir/.gitconfig"
@@ -90,6 +95,11 @@ in
     # 期望结构：~/dotfiles/.local/share/fcitx5/rime
     if [ -d "$dotfilesDir/.local/share/fcitx5/rime" ]; then
       backup_and_link "$homeDir/.local/share/fcitx5/rime" "$dotfilesDir/.local/share/fcitx5/rime"
+    fi
+
+    # tmux 主题/脚本常通过 run-shell 直接执行，确保有可执行权限
+    if [ -d "$homeDir/.config/tmux/scripts" ]; then
+      chmod -R u+rx "$homeDir/.config/tmux/scripts" 2>/dev/null || true
     fi
     chown -hR "$user:users" "$homeDir/.config" 2>/dev/null || true
   '';
