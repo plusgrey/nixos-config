@@ -58,7 +58,8 @@ in
     backup_and_link "$homeDir/.config/tmux"    "$dotfilesDir/.config/tmux"
     backup_and_link "$homeDir/.config/yazi"    "$dotfilesDir/.config/yazi"
     backup_and_link "$homeDir/.config/wezterm" "$dotfilesDir/.config/wezterm"
-
+    backup_and_link "$homeDir/.config/niri"     "$dotfilesDir/.config/niri"
+    backup_and_link "$homeDir/.config/noctalia" "$dotfilesDir/.config/noctalia"
     chown -hR "$user:users" "$homeDir/.config" 2>/dev/null || true
   '';
 
@@ -265,6 +266,19 @@ in
     enableCompletion = true;
     autosuggestions.enable = true;
     syntaxHighlighting.enable = true;
+  };
+
+  # 某些程序/配置会硬编码 /bin/zsh（NixOS 默认没有 /bin）。
+  # 用 tmpfiles 更可靠：开机就会确保软链接存在。
+  systemd.tmpfiles.rules = [
+    "d /bin 0755 root root - -"
+    "L+ /bin/zsh - - - - ${pkgs.zsh}/bin/zsh"
+    "L+ /bin/bash - - - - ${pkgs.bashInteractive}/bin/bash"
+    "L+ /bin/sh - - - - ${pkgs.bashInteractive}/bin/sh"
+  ];
+
+  environment.sessionVariables = {
+    SHELL = "${pkgs.zsh}/bin/zsh";
   };
 
   # --- 10. Nix-ld (解决二进制兼容性) ---
