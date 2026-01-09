@@ -22,6 +22,19 @@ nix-config/
         └── hardware-configuration.nix  # 硬件配置 (自动生成)
 ```
 
+## ✅ 管理策略（重要）
+
+这套配置现在遵循：
+
+- **dotfiles：你手动管理**（例如 `~/dotfiles` + 自己的 `install.sh`/软链接脚本）
+- **NixOS：只负责系统级依赖**（软件包、服务、驱动、输入法、字体等）
+- **Home Manager：不再生成/链接任何应用配置文件**（避免覆盖你的 dotfiles）
+
+另外：
+
+- **Noctalia Shell** 通过 flake input 提供（而不是强依赖 nixpkgs 里一定存在同名包）
+- 你的 dotfiles 会调用 `qs -c noctalia-shell ...`，因此系统需要提供 **QuickShell（`qs`）**
+
 ## 🚀 安装步骤
 
 ### 第一阶段：安装 NixOS 基础系统
@@ -152,6 +165,13 @@ mkdir -p ~/dotfiles
 git clone https://github.com/你的用户名/dotfiles.git ~/dotfiles
 ```
 
+应用 Nix 配置后，再执行你的 dotfiles 安装/链接流程（例如）：
+
+```bash
+cd ~/dotfiles
+./install.sh
+```
+
 #### 3. 复制硬件配置
 
 ```bash
@@ -171,7 +191,7 @@ cp /etc/nixos/hardware-configuration.nix ~/Projects/nix-config/hosts/default/
 - 检查 NVIDIA 驱动设置（如果使用其他显卡，删除或修改相关配置）
 
 **home/default.nix:**
-- 修改 `dotfilesPath` 路径为你的实际 dotfiles 位置（默认 `/home/jh/dotfiles`）
+- 不再需要配置 `dotfilesPath`；Home Manager 不会再替你链接/管理 dotfiles
 
 #### 5. 首次构建
 

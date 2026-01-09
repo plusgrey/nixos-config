@@ -1,5 +1,11 @@
 { config, pkgs, inputs, ... }:
 
+let
+  # Noctalia Shell：优先使用 nixpkgs（如果存在），否则使用 flake input。
+  noctaliaShellPkg =
+    if pkgs ? noctalia-shell then pkgs.noctalia-shell
+    else inputs.noctalia-shell.packages.${pkgs.system}.default;
+in
 {
   imports = [
     ./hardware-configuration.nix
@@ -124,9 +130,57 @@
     # 终端工具
     # starship   # 提示符 (已在 dotfiles 中使用 zim 自带主题)
     tmux
+
+    # dotfiles 相关依赖（仅提供命令/运行时，不管理配置文件内容）
+    fzf
+    jq
+    wl-clipboard
+    xclip
+    xsel
+
+    # 常用 CLI（你的 dotfiles / 工作流会用到）
+    neovim
+    yazi
+    bat
+    eza
+    lazygit
+    gh
+    zoxide
+    atuin
+
+    # 终端/桌面应用（配置由 dotfiles 自己管）
+    wezterm
+    google-chrome
+    vscode
+    insomnia
+
+    # Wayland & 桌面常用工具
+    wlr-randr
+    hyprpicker
+    grim
+    slurp
+    swappy
+    mako
+
+    # Noctalia dotfiles 依赖：提供 `qs` 命令（niri/config.kdl 与 noctalia/settings.json 会调用）
+    quickshell
+
+    # 文件/媒体
+    nautilus
+    file-roller
+    mpv
+    imv
+    pavucontrol
+
+    # 系统托盘/主题工具
+    polkit_gnome
+    networkmanagerapplet
+    nwg-look
+    qt6Packages.qt6ct
+    papirus-icon-theme
     
-    # Noctalia Shell (如果在 nixpkgs 中可用)
-    noctalia-shell
+    # Noctalia Shell（二选一来源：nixpkgs 或 flake input）
+    noctaliaShellPkg
     
     # 其他实用工具
     mediainfo
@@ -296,5 +350,5 @@
   
   nixpkgs.config.allowUnfree = true;
 
-  system.stateVersion = "24.11"; 
+  system.stateVersion = "25.11"; 
 }
