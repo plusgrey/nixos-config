@@ -20,6 +20,16 @@ let
       --ozone-platform-hint=auto \
       "$@"
   '';
+
+  # 兼容：有些配置会调用 `qs ...`，但不同打包方式可能只有 `quickshell`。
+  # 这个 wrapper 会优先转发给 quickshell 自带的 `qs`，否则退回到 `quickshell`。
+  qsCompat = pkgs.writeShellScriptBin "qs" ''
+    set -e
+    if [ -x "${pkgs.quickshell}/bin/qs" ]; then
+      exec "${pkgs.quickshell}/bin/qs" "$@"
+    fi
+    exec "${pkgs.quickshell}/bin/quickshell" "$@"
+  '';
 in
 {
   imports = [
@@ -96,11 +106,17 @@ in
   time.timeZone = "Asia/Singapore";
   i18n.defaultLocale = "en_US.UTF-8";
 
+  # 只影响“界面消息”语言（不强制改变日期/数字等格式），
+  # 用于避免 fcitx5 之类组件默认落到繁体翻译。
+  i18n.extraLocaleSettings = {
+    LC_MESSAGES = "zh_CN.UTF-8";
+    LC_CTYPE = "zh_CN.UTF-8";
+  };
+
   # 额外的语言支持
   i18n.supportedLocales = [
     "en_US.UTF-8/UTF-8"
     "zh_CN.UTF-8/UTF-8"
-    "zh_TW.UTF-8/UTF-8"
   ];
 
   # --- 3. 显卡驱动 (NVIDIA) ---
@@ -236,6 +252,7 @@ in
 
     # Noctalia dotfiles 依赖：提供 `qs` 命令（niri/config.kdl 与 noctalia/settings.json 会调用）
     quickshell
+    qsCompat
     # Noctalia 文档里的必需依赖
     gpu-screen-recorder
     brightnessctl
@@ -413,7 +430,7 @@ in
     WLR_NO_HARDWARE_CURSORS = "1";
     
     # 输入法
-    GTK_IM_MODULE = "fcitx";
+    #GTK_IM_MODULE = "fcitx";
     QT_IM_MODULE = "fcitx";
     XMODIFIERS = "@im=fcitx";
     SDL_IM_MODULE = "fcitx";
@@ -425,6 +442,7 @@ in
     wlr.enable = true;
     extraPortals = with pkgs; [
       xdg-desktop-portal-gtk
+      xdg-desktop-portal-kde
     ];
   };
 
