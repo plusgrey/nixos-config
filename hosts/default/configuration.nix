@@ -260,7 +260,7 @@ in
 
     # Noctalia dotfiles 依赖：提供 `qs` 命令（niri/config.kdl 与 noctalia/settings.json 会调用）
     quickshell
-    qsCompat
+
     # Noctalia 文档里的必需依赖
     gpu-screen-recorder
     brightnessctl
