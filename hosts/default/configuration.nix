@@ -159,6 +159,23 @@ in
   # XWayland (用于 X11 应用兼容)
   programs.xwayland.enable = true;
 
+  # --- 5.1 xwayland-satellite 用户服务 ---
+  # 原因：Niri 是纯 Wayland 合成器，不内置 XWayland 支持
+  # xwayland-satellite 提供独立的 XWayland 实现，让 Steam 等 X11 应用能运行
+  # 预期效果：登录 Niri 后自动启动 xwayland-satellite，Steam 可以正常打开
+  systemd.user.services.xwayland-satellite = {
+    description = "XWayland Satellite for Niri";
+    wantedBy = [ "graphical-session.target" ];
+    partOf = [ "graphical-session.target" ];
+    after = [ "graphical-session.target" ];
+    serviceConfig = {
+      Type = "simple";
+      ExecStart = "${pkgs.xwayland-satellite}/bin/xwayland-satellite :0";
+      Restart = "on-failure";
+      RestartSec = 1;
+    };
+  };
+
   # --- 6. 输入法 (Fcitx5) ---
   # 系统级启用，保证在任何地方都能调起守护进程
   i18n.inputMethod = {
@@ -173,8 +190,12 @@ in
       librime-lua
       # rime-ice 雾凇拼音方案数据
       # 通过 fcitx5-rime.override 将 rime-ice 作为数据源
-      # 这样 fcitx5-rime 在加载时会自动找到 rime-ice 的词典和方案
-      (fcitx5-rime.override { rimeDataPkgs = [ rime-ice ]; })
+      # rimeDataPkgs 会把 rime-ice 的方案文件放到正确的位置
+      (fcitx5-rime.override { 
+        rimeDataPkgs = [ 
+          rime-ice  # 雾凇拼音主方案
+        ]; 
+      })
     ];
     fcitx5.waylandFrontend = true;
   };
@@ -469,9 +490,10 @@ in
     XMODIFIERS = "@im=fcitx";
     SDL_IM_MODULE = "fcitx";
 
-    # Rime 数据目录 - 指向 rime-ice 雾凇拼音
-    # 这确保 fcitx5-rime 能找到 rime-ice 的词典和方案
-    NIX_RIME_DATA_DIR = "${pkgs.rime-ice}/share/rime-data";
+    # XWayland DISPLAY - 用于 xwayland-satellite
+    # 原因：Niri 是纯 Wayland 合成器，需要 xwayland-satellite 提供 X11 兼容层
+    # Steam 等 X11 应用需要这个环境变量才能连接到 XWayland
+    DISPLAY = ":0";
 
     # 优先使用简体中文翻译（避免某些组件默认落到繁体翻译）
     LANGUAGE = "zh_CN:en_US";
