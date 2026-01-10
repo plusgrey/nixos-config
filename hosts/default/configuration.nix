@@ -174,6 +174,7 @@ in
       RestartSec = 1;
       # 设置 DISPLAY 环境变量供子进程使用
       Environment = "DISPLAY=:0";
+      RIME_USER_DATA_DIR = "$HOME/.local/share/fcitx5/rime";
     };
   };
 
@@ -191,11 +192,7 @@ in
       fcitx5-fluent
       librime
       librime-lua
-      (fcitx5-rime.override {
-        rimeDataPkgs = [
-          pkgs.rime-ice
-        ];
-      })
+      fcitx5-rime
     ];
     fcitx5.waylandFrontend = true;
   };
@@ -218,7 +215,8 @@ in
     gnumake
     gcc
     cmake
-    
+    rime-ice
+
     # 搜索工具
     ripgrep
     fd
@@ -480,7 +478,7 @@ in
     WLR_NO_HARDWARE_CURSORS = "1";
     
     # 输入法
-    #GTK_IM_MODULE = "fcitx";
+    GTK_IM_MODULE = "fcitx";
     QT_IM_MODULE = "fcitx";
     XMODIFIERS = "@im=fcitx";
     SDL_IM_MODULE = "fcitx";
