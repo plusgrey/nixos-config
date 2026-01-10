@@ -1,6 +1,7 @@
 { config, pkgs, inputs, ... }:
 
 let
+  lib = pkgs.lib;
   # Noctalia Shell：优先使用 nixpkgs（如果存在），否则使用 flake input。
   noctaliaShellPkg =
     if pkgs ? noctalia-shell then pkgs.noctalia-shell
@@ -8,9 +9,11 @@ let
 
   # Rime 方案数据（雾凇拼音 / rime-ice 等）。
   # 某些渠道/版本的 nixpkgs 里可能没有这些属性，所以这里做了兼容。
-  # rimeDataPkg = if builtins.hasAttr "rime-data" pkgs then pkgs."rime-data" else null;
-  # rimeIcePkg = if builtins.hasAttr "rime-ice" pkgs then pkgs."rime-ice" else null;
-  # rimeSchemaPkgs = builtins.filter (p: p != null) [ rimeDataPkg rimeIcePkg ];
+  rimeDataPkg = if builtins.hasAttr "rime-data" pkgs then pkgs."rime-data" else null;
+  rimeIcePkg = if builtins.hasAttr "rime-ice" pkgs then pkgs."rime-ice" else null;
+  rimeSchemaPkgs = builtins.filter (p: p != null) [ rimeDataPkg rimeIcePkg ];
+  rimeSchemaDirs = map (p: "${p}/share/rime-data") rimeSchemaPkgs;
+  rimeSchemaDirsQuoted = lib.concatStringsSep " " (map (d: "\"${d}\"") rimeSchemaDirs);
 
   # 让 Chrome 在 Wayland 下也能正常使用输入法（KDE Wayland 常见问题）。
   # 说明：用 symlinkJoin + wrapProgram 保留 .desktop 文件（否则 App Launcher 扫不到 Chrome）。
@@ -136,7 +139,8 @@ in
     nvidiaSettings = true;
     package = config.boot.kernelPackages.nvidiaPackages.beta; 
   };
-
+  hardware.opengl.enable = true;
+  hardware.opengl.dirSupport32Bit = true;
   # --- 4. 桌面环境与登录器 ---
   # SDDM 登录管理器 (支持 Wayland)
   services.displayManager.sddm = {
@@ -184,7 +188,7 @@ in
   };
 
   # --- 8. 系统级开发环境 & 工具 ---
-  environment.systemPackages = with pkgs; [
+  environment.systemPackages = (with pkgs; [
     # 核心工具
     git
     wget
@@ -274,11 +278,8 @@ in
 
     # 输入法配置等工具
     qt6Packages.fcitx5-configtool
-    rime-lua-tools
-    rime-ice
 
-    # 文件/媒体
-    nautilus
+    # 文件/媒
     file-roller
     mpv
     imv
@@ -303,7 +304,11 @@ in
     # Steam 相关
     steam-run           # 运行非 Steam 游戏
     protontricks        # Proton 配置工具
-    
+    lib32Mesa
+    vulkan-loader
+    lib32Vulkan-loader
+    lib32Gl
+    lib32GCC 
     # 游戏启动器
     # lutris              # 游戏启动器
     # heroic              # Epic/GOG 启动器
@@ -319,7 +324,7 @@ in
     
     # 手柄支持
     antimicrox          # 手柄映射
-  ];
+  ]) ++ rimeSchemaPkgs;
 
   # --- 9. Zsh ---
   programs.zsh = {
