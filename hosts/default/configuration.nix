@@ -168,10 +168,13 @@ in
       fcitx5-gtk
       qt6Packages.fcitx5-qt  # Qt6 支持
       qt6Packages.fcitx5-chinese-addons  # 包含 pinyin, table 等
-      fcitx5-rime            # Rime 输入法
       fcitx5-nord
       librime
       librime-lua
+      # rime-ice 雾凇拼音方案数据
+      # 通过 fcitx5-rime.override 将 rime-ice 作为数据源
+      # 这样 fcitx5-rime 在加载时会自动找到 rime-ice 的词典和方案
+      (fcitx5-rime.override { rimeDataPkgs = [ rime-ice ]; })
     ];
     fcitx5.waylandFrontend = true;
   };
@@ -465,6 +468,10 @@ in
     QT_IM_MODULE = "fcitx";
     XMODIFIERS = "@im=fcitx";
     SDL_IM_MODULE = "fcitx";
+
+    # Rime 数据目录 - 指向 rime-ice 雾凇拼音
+    # 这确保 fcitx5-rime 能找到 rime-ice 的词典和方案
+    NIX_RIME_DATA_DIR = "${pkgs.rime-ice}/share/rime-data";
 
     # 优先使用简体中文翻译（避免某些组件默认落到繁体翻译）
     LANGUAGE = "zh_CN:en_US";
