@@ -163,16 +163,20 @@ in
   # 原因：Niri 是纯 Wayland 合成器，不内置 XWayland 支持
   # xwayland-satellite 提供独立的 XWayland 实现，让 Steam 等 X11 应用能运行
   # 预期效果：登录 Niri 后自动启动 xwayland-satellite，Steam 可以正常打开
+  # 注意：只在 Niri 会话中启动，不影响 KDE Plasma
   systemd.user.services.xwayland-satellite = {
     description = "XWayland Satellite for Niri";
-    wantedBy = [ "graphical-session.target" ];
-    partOf = [ "graphical-session.target" ];
-    after = [ "graphical-session.target" ];
+    # 只在 niri 会话中启动
+    wantedBy = [ "niri.service" ];
+    after = [ "niri.service" ];
+    requisite = [ "niri.service" ];
     serviceConfig = {
       Type = "simple";
       ExecStart = "${pkgs.xwayland-satellite}/bin/xwayland-satellite :0";
       Restart = "on-failure";
       RestartSec = 1;
+      # 设置 DISPLAY 环境变量供子进程使用
+      Environment = "DISPLAY=:0";
     };
   };
 
@@ -490,10 +494,9 @@ in
     XMODIFIERS = "@im=fcitx";
     SDL_IM_MODULE = "fcitx";
 
-    # XWayland DISPLAY - 用于 xwayland-satellite
-    # 原因：Niri 是纯 Wayland 合成器，需要 xwayland-satellite 提供 X11 兼容层
-    # Steam 等 X11 应用需要这个环境变量才能连接到 XWayland
-    DISPLAY = ":0";
+    # 注意：DISPLAY 环境变量不在这里设置
+    # 对于 Niri，在 niri config.kdl 的 environment 块中设置 DISPLAY=":0"
+    # 对于 KDE Plasma，不需要手动设置 DISPLAY
 
     # 优先使用简体中文翻译（避免某些组件默认落到繁体翻译）
     LANGUAGE = "zh_CN:en_US";
