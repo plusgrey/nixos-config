@@ -32,6 +32,9 @@ let
   qsCompat = pkgs.writeShellScriptBin "qs" ''
     set -euo pipefail
 
+    # Keep a copy of original args so we can fall back without losing `-c <cfg>`.
+    orig_args=("$@")
+
     # Prefer upstream qs if it exists in this quickshell package.
     if [ -x "${pkgs.quickshell}/bin/qs" ]; then
       exec "${pkgs.quickshell}/bin/qs" "$@"
@@ -42,22 +45,33 @@ let
     # In that case, just run the target program directly.
     if [ "$#" -ge 2 ] && [ "$1" = "-c" ]; then
       cfg="$2"
-      shift 2
 
       # Most common case: `qs -c noctalia-shell`
+      if [ "$cfg" = "noctalia-shell" ] && [ -x "${noctaliaShellPkg}/bin/noctalia-shell" ]; then
+        shift 2
+        exec "${noctaliaShellPkg}/bin/noctalia-shell" "$@"
+      fi
+
+      # Fallback to PATH (some users provide their own noctalia-shell)
       if [ "$cfg" = "noctalia-shell" ] && command -v noctalia-shell >/dev/null 2>&1; then
+        shift 2
         exec noctalia-shell "$@"
       fi
 
       # Generic: if cfg is an executable available in PATH, run it.
       if command -v "$cfg" >/dev/null 2>&1; then
+        shift 2
         exec "$cfg" "$@"
       fi
 
       # If cfg is a file path, try passing it as a config to quickshell.
       if [ -e "$cfg" ]; then
+        shift 2
         exec "${pkgs.quickshell}/bin/quickshell" --config "$cfg" "$@"
       fi
+
+      # Otherwise, fall back to quickshell with original args intact.
+      set -- "${orig_args[@]}"
     fi
 
     exec "${pkgs.quickshell}/bin/quickshell" "$@"
@@ -219,7 +233,7 @@ in
   };
 
   # --- 8. 系统级开发环境 & 工具 ---
-  environment.systemPackages = (with pkgs; [
+  environment.systemPackages = with pkgs; [
     # 核心工具
     git
     wget
@@ -309,6 +323,8 @@ in
 
     # 输入法配置等工具
     qt6Packages.fcitx5-configtool
+    rime-lua-tools
+    rime-ice
 
     # 文件/媒体
     nautilus
@@ -352,7 +368,7 @@ in
     
     # 手柄支持
     antimicrox          # 手柄映射
-  ]) ++ rimeSchemaPkgs;
+  ];
 
   # --- 9. Zsh ---
   programs.zsh = {
@@ -372,9 +388,7 @@ in
     "L+ /bin/sh - - - - ${pkgs.bashInteractive}/bin/sh"
   ];
 
-  environment.sessionVariables = {
-    SHELL = "${pkgs.zsh}/bin/zsh";
-  };
+  environment.sessionVariables.SHELL = "${pkgs.zsh}/bin/zsh";
 
   # --- 10. Nix-ld (解决二进制兼容性) ---
   programs.nix-ld.enable = true;
@@ -491,6 +505,7 @@ in
 
   # --- 18. 环境变量 ---
   environment.sessionVariables = {
+    SHELL = "${pkgs.zsh}/bin/zsh";
     # Wayland
     NIXOS_OZONE_WL = "1";
     WLR_NO_HARDWARE_CURSORS = "1";
