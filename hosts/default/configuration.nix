@@ -189,17 +189,11 @@ in
       fcitx5-gtk
       qt6Packages.fcitx5-qt  # Qt6 支持
       qt6Packages.fcitx5-chinese-addons  # 包含 pinyin, table 等
+      kdePackages.fcitx5-qt
       fcitx5-nord
       librime
       librime-lua
-      # rime-ice 雾凇拼音方案数据
-      # 通过 fcitx5-rime.override 将 rime-ice 作为数据源
-      # rimeDataPkgs 会把 rime-ice 的方案文件放到正确的位置
-      (fcitx5-rime.override { 
-        rimeDataPkgs = [ 
-          rime-ice  # 雾凇拼音主方案
-        ]; 
-      })
+      rime-ice #雾凇拼音方案
     ];
     fcitx5.waylandFrontend = true;
   };
@@ -303,7 +297,6 @@ in
 
     # 输入法配置等工具
     qt6Packages.fcitx5-configtool
-    rime-ice
 
     # 文件/媒体
     nautilus
