@@ -178,6 +178,10 @@ in
       qt6Packages.fcitx5-chinese-addons  # 包含 pinyin, table 等
       fcitx5-rime            # Rime 输入法
       fcitx5-nord
+      librime
+      librime-lua
+      rime-ice              # 雾凇拼音方案
+      rime-data             # Rime 方案数据
     ];
     fcitx5.waylandFrontend = true;
   };
