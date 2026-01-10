@@ -88,12 +88,6 @@ in
     backup_and_link "$homeDir/.config/niri"     "$dotfilesDir/.config/niri"
     backup_and_link "$homeDir/.config/noctalia" "$dotfilesDir/.config/noctalia"
 
-    # fcitx5/rime 用户词库与方案（建议用 dotfiles 管理，比如放入 rime-ice）
-    # 期望结构：~/dotfiles/.local/share/fcitx5/rime
-    if [ -d "$dotfilesDir/.local/share/fcitx5/rime" ]; then
-      backup_and_link "$homeDir/.local/share/fcitx5/rime" "$dotfilesDir/.local/share/fcitx5/rime"
-    fi
-
     # tmux 主题/脚本常通过 run-shell 直接执行，确保有可执行权限
     if [ -d "$homeDir/.config/tmux/scripts" ]; then
       chmod -R u+rx "$homeDir/.config/tmux/scripts" 2>/dev/null || true
@@ -186,14 +180,19 @@ in
     enable = true;
     type = "fcitx5";
     fcitx5.addons = with pkgs; [
+      # 输入法配置等工具
+      qt6Packages.fcitx5-configtool
       fcitx5-gtk
       qt6Packages.fcitx5-qt  # Qt6 支持
       qt6Packages.fcitx5-chinese-addons  # 包含 pinyin, table 等
-      kdePackages.fcitx5-qt
-      fcitx5-nord
+      fcitx5-fluent
       librime
       librime-lua
-      rime-ice #雾凇拼音方案
+      (fcitx5-rime.override {
+        rimeDataPkgs = [
+          pkgs.rime-ice
+        ];
+      })
     ];
     fcitx5.waylandFrontend = true;
   };
@@ -295,11 +294,7 @@ in
     wlsunset
     evolution-data-server
 
-    # 输入法配置等工具
-    qt6Packages.fcitx5-configtool
-
-    # 文件/媒体
-    nautilus
+    # 文件/媒体管理器
     file-roller
     mpv
     imv
