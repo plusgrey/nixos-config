@@ -180,8 +180,6 @@ in
       fcitx5-nord
       librime
       librime-lua
-      rime-ice              # 雾凇拼音方案
-      rime-data             # Rime 方案数据
     ];
     fcitx5.waylandFrontend = true;
   };
@@ -268,7 +266,6 @@ in
     grim
     slurp
     swappy
-    mako
 
     # Noctalia dotfiles 依赖：提供 `qs` 命令（niri/config.kdl 与 noctalia/settings.json 会调用）
     quickshell
@@ -284,8 +281,10 @@ in
     wlsunset
     evolution-data-server
 
-    # 输入法配置 GUI
+    # 输入法配置等工具
     qt6Packages.fcitx5-configtool
+    rime-ice              # 雾凇拼音方案
+    rime-data             # Rime 方案数据
 
     # 文件/媒体
     nautilus
