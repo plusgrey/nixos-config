@@ -170,22 +170,22 @@ in
   # xwayland-satellite 提供独立的 XWayland 实现，让 Steam 等 X11 应用能运行
   # 预期效果：登录 Niri 后自动启动 xwayland-satellite，Steam 可以正常打开
   # 注意：只在 Niri 会话中启动，不影响 KDE Plasma
-  systemd.user.services.xwayland-satellite = {
-    description = "XWayland Satellite for Niri";
-    # 只在 niri 会话中启动
-    wantedBy = [ "niri.service" ];
-    after = [ "niri.service" ];
-    requisite = [ "niri.service" ];
-    serviceConfig = {
-      Type = "simple";
-      ExecStart = "${pkgs.xwayland-satellite}/bin/xwayland-satellite :0";
-      Restart = "on-failure";
-      RestartSec = 1;
-      # 设置 DISPLAY 环境变量供子进程使用
-      Environment = "DISPLAY=:0";
-      RIME_USER_DATA_DIR = "$HOME/.local/share/fcitx5/rime";
-    };
-  };
+  # systemd.user.services.xwayland-satellite = {
+  #   description = "XWayland Satellite for Niri";
+  #   # 只在 niri 会话中启动
+  #   wantedBy = [ "niri.service" ];
+  #   after = [ "niri.service" ];
+  #   requisite = [ "niri.service" ];
+  #   serviceConfig = {
+  #     Type = "simple";
+  #     ExecStart = "${pkgs.xwayland-satellite}/bin/xwayland-satellite :0";
+  #     Restart = "on-failure";
+  #     RestartSec = 1;
+  #     # 设置 DISPLAY 环境变量供子进程使用
+  #     # Environment = "DISPLAY=:0";
+  #     # RIME_USER_DATA_DIR = "$HOME/.local/share/fcitx5/rime";
+  #   };
+  # };
 
   # --- 6. 输入法 (Fcitx5) ---
   # 系统级启用，保证在任何地方都能调起守护进程
@@ -202,6 +202,7 @@ in
       librime
       librime-lua
       fcitx5-rime
+      pkgs.rime-ice
     ];
     fcitx5.waylandFrontend = true;
   };
@@ -224,7 +225,6 @@ in
     gnumake
     gcc
     cmake
-    rime-ice
 
     # 搜索工具
     ripgrep
