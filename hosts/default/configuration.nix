@@ -103,15 +103,6 @@ in
     fi
     chown -hR "$user:users" "$homeDir/.config" 2>/dev/null || true
   '';
-  systemd.user.services.xwayland-satellite = {
-    description = "Xwayland outside your compositor";
-    wantedBy = [ "graphical-session.target" ];
-    partOf = [ "graphical-session.target" ];
-    serviceConfig = {
-      ExecStart = "${pkgs.xwayland-satellite}/bin/xwayland-satellite";
-      Restart = "on-failure";
-    };
-  };
   # --- 1. 启动与内核 ---
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
