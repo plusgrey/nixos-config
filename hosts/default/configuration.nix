@@ -30,10 +30,36 @@ let
   # 兼容：有些配置会调用 `qs ...`，但不同打包方式可能只有 `quickshell`。
   # 这个 wrapper 会优先转发给 quickshell 自带的 `qs`，否则退回到 `quickshell`。
   qsCompat = pkgs.writeShellScriptBin "qs" ''
-    set -e
+    set -euo pipefail
+
+    # Prefer upstream qs if it exists in this quickshell package.
     if [ -x "${pkgs.quickshell}/bin/qs" ]; then
       exec "${pkgs.quickshell}/bin/qs" "$@"
     fi
+
+    # Compat for setups where nixpkgs only ships `quickshell` (no `qs`).
+    # Noctalia and some dotfiles call: `qs -c noctalia-shell ...`
+    # In that case, just run the target program directly.
+    if [ "$#" -ge 2 ] && [ "$1" = "-c" ]; then
+      cfg="$2"
+      shift 2
+
+      # Most common case: `qs -c noctalia-shell`
+      if [ "$cfg" = "noctalia-shell" ] && command -v noctalia-shell >/dev/null 2>&1; then
+        exec noctalia-shell "$@"
+      fi
+
+      # Generic: if cfg is an executable available in PATH, run it.
+      if command -v "$cfg" >/dev/null 2>&1; then
+        exec "$cfg" "$@"
+      fi
+
+      # If cfg is a file path, try passing it as a config to quickshell.
+      if [ -e "$cfg" ]; then
+        exec "${pkgs.quickshell}/bin/quickshell" --config "$cfg" "$@"
+      fi
+    fi
+
     exec "${pkgs.quickshell}/bin/quickshell" "$@"
   '';
 in
@@ -283,8 +309,6 @@ in
 
     # 输入法配置等工具
     qt6Packages.fcitx5-configtool
-    rime-ice              # 雾凇拼音方案
-    rime-data             # Rime 方案数据
 
     # 文件/媒体
     nautilus
