@@ -14,14 +14,17 @@ let
 
   # 让 Chrome 在 Wayland 下也能正常使用输入法（KDE Wayland 常见问题）。
   # 说明：用 symlinkJoin + wrapProgram 保留 .desktop 文件（否则 App Launcher 扫不到 Chrome）。
-  googleChromeIme = pkgs.symlinkJoin {
+googleChromeIme = pkgs.symlinkJoin {
     name = "google-chrome-ime";
     paths = [ pkgs.google-chrome ];
     nativeBuildInputs = [ pkgs.makeWrapper ];
     postBuild = ''
       for bin in "$out/bin/google-chrome-stable" "$out/bin/google-chrome"; do
         if [ -x "$bin" ]; then
-          wrapProgram "$bin" --add-flags "--enable-wayland-ime --ozone-platform-hint=auto"
+          # 修改点：增加了 --gtk-version=4
+          # 这会强制 Chrome 使用 GTK4 的输入法上下文逻辑，通常能修复 KDE 下的 Fcitx5 问题
+          wrapProgram "$bin" \
+            --add-flags "--enable-wayland-ime --ozone-platform-hint=auto --gtk-version=4"
         fi
       done
     '';
