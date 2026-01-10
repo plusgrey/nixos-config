@@ -8,9 +8,9 @@ let
 
   # Rime 方案数据（雾凇拼音 / rime-ice 等）。
   # 某些渠道/版本的 nixpkgs 里可能没有这些属性，所以这里做了兼容。
-  rimeDataPkg = if builtins.hasAttr "rime-data" pkgs then pkgs."rime-data" else null;
-  rimeIcePkg = if builtins.hasAttr "rime-ice" pkgs then pkgs."rime-ice" else null;
-  rimeSchemaPkgs = builtins.filter (p: p != null) [ rimeDataPkg rimeIcePkg ];
+  # rimeDataPkg = if builtins.hasAttr "rime-data" pkgs then pkgs."rime-data" else null;
+  # rimeIcePkg = if builtins.hasAttr "rime-ice" pkgs then pkgs."rime-ice" else null;
+  # rimeSchemaPkgs = builtins.filter (p: p != null) [ rimeDataPkg rimeIcePkg ];
 
   # 让 Chrome 在 Wayland 下也能正常使用输入法（KDE Wayland 常见问题）。
   # 说明：用 symlinkJoin + wrapProgram 保留 .desktop 文件（否则 App Launcher 扫不到 Chrome）。
@@ -27,55 +27,6 @@ let
     '';
   };
 
-  # 兼容：有些配置会调用 `qs ...`，但不同打包方式可能只有 `quickshell`。
-  # 这个 wrapper 会优先转发给 quickshell 自带的 `qs`，否则退回到 `quickshell`。
-  qsCompat = pkgs.writeShellScriptBin "qs" ''
-    set -euo pipefail
-
-    # Keep a copy of original args so we can fall back without losing `-c <cfg>`.
-    orig_args=("$@")
-
-    # Prefer upstream qs if it exists in this quickshell package.
-    if [ -x "${pkgs.quickshell}/bin/qs" ]; then
-      exec "${pkgs.quickshell}/bin/qs" "$@"
-    fi
-
-    # Compat for setups where nixpkgs only ships `quickshell` (no `qs`).
-    # Noctalia and some dotfiles call: `qs -c noctalia-shell ...`
-    # In that case, just run the target program directly.
-    if [ "$#" -ge 2 ] && [ "$1" = "-c" ]; then
-      cfg="$2"
-
-      # Most common case: `qs -c noctalia-shell`
-      if [ "$cfg" = "noctalia-shell" ] && [ -x "${noctaliaShellPkg}/bin/noctalia-shell" ]; then
-        shift 2
-        exec "${noctaliaShellPkg}/bin/noctalia-shell" "$@"
-      fi
-
-      # Fallback to PATH (some users provide their own noctalia-shell)
-      if [ "$cfg" = "noctalia-shell" ] && command -v noctalia-shell >/dev/null 2>&1; then
-        shift 2
-        exec noctalia-shell "$@"
-      fi
-
-      # Generic: if cfg is an executable available in PATH, run it.
-      if command -v "$cfg" >/dev/null 2>&1; then
-        shift 2
-        exec "$cfg" "$@"
-      fi
-
-      # If cfg is a file path, try passing it as a config to quickshell.
-      if [ -e "$cfg" ]; then
-        shift 2
-        exec "${pkgs.quickshell}/bin/quickshell" --config "$cfg" "$@"
-      fi
-
-      # Otherwise, fall back to quickshell with original args intact.
-      set -- "${orig_args[@]}"
-    fi
-
-    exec "${pkgs.quickshell}/bin/quickshell" "$@"
-  '';
 in
 {
   imports = [
@@ -505,7 +456,6 @@ in
 
   # --- 18. 环境变量 ---
   environment.sessionVariables = {
-    SHELL = "${pkgs.zsh}/bin/zsh";
     # Wayland
     NIXOS_OZONE_WL = "1";
     WLR_NO_HARDWARE_CURSORS = "1";
