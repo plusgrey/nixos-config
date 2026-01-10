@@ -103,7 +103,15 @@ in
     fi
     chown -hR "$user:users" "$homeDir/.config" 2>/dev/null || true
   '';
-
+  systemd.user.services.xwayland-satellite = {
+    description = "Xwayland outside your compositor";
+    wantedBy = [ "graphical-session.target" ];
+    partOf = [ "graphical-session.target" ];
+    serviceConfig = {
+      ExecStart = "${pkgs.xwayland-satellite}/bin/xwayland-satellite";
+      Restart = "on-failure";
+    };
+  };
   # --- 1. 启动与内核 ---
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
@@ -132,6 +140,9 @@ in
   # --- 3. 显卡驱动 (NVIDIA) ---
   services.xserver.videoDrivers = [ "nvidia" ];
   hardware.graphics.enable = true;
+  hardware.graphics.enable32Bit = true;
+  hardware.graphics.extraPackages = with pkgs; [ vulkan-tools ];
+  hardware.graphics.extraPackages32 = with pkgs; [ vulkan-tools ];
   hardware.nvidia = {
     modesetting.enable = true;
     powerManagement.enable = false; 
@@ -140,7 +151,7 @@ in
     package = config.boot.kernelPackages.nvidiaPackages.beta; 
   };
   hardware.opengl.enable = true;
-  hardware.opengl.dirSupport32Bit = true;
+  hardware.opengl.driSupport32Bit = true;
   # --- 4. 桌面环境与登录器 ---
   # SDDM 登录管理器 (支持 Wayland)
   services.displayManager.sddm = {
@@ -304,11 +315,7 @@ in
     # Steam 相关
     steam-run           # 运行非 Steam 游戏
     protontricks        # Proton 配置工具
-    lib32Mesa
-    vulkan-loader
-    lib32Vulkan-loader
-    lib32Gl
-    lib32GCC 
+    xwayland-satellite # 改善 Steam/Proton 在 Wayland 下的兼容性
     # 游戏启动器
     # lutris              # 游戏启动器
     # heroic              # Epic/GOG 启动器
@@ -473,6 +480,7 @@ in
 
     # 优先使用简体中文翻译（避免某些组件默认落到繁体翻译）
     LANGUAGE = "zh_CN:en_US";
+    DISPLAY = ":23";  # 默认 Wayland 显示服务器
   };
 
   # Wayland Portal（让 Wayland 应用与桌面集成更稳定；Noctalia 部分功能也会用到）
