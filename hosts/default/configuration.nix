@@ -101,6 +101,15 @@ in
   # --- 1. 启动与内核 ---
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
+  
+  # 使用最新内核（而不是默认的 LTS 内核）
+  # 原因：获取最新硬件支持和功能
+  # 可选值：
+  #   pkgs.linuxPackages_latest  - 最新稳定内核
+  #   pkgs.linuxPackages_zen     - Zen 内核（游戏优化）
+  #   pkgs.linuxPackages_xanmod  - XanMod 内核（性能优化）
+  boot.kernelPackages = pkgs.linuxPackages_zen;
+  
   # Nvidia 必选参数，防止画面撕裂和 Wayland 问题
   boot.kernelParams = [ "nvidia-drm.modeset=1" ];
 

@@ -6,7 +6,7 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
     # 稳定分支，用于某些需要稳定版本的软件
-    nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.05";
+    nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.11";
 
     # Niri Flake: 获取最新版 Niri 合成器
     niri.url = "github:sodiboo/niri-flake";
