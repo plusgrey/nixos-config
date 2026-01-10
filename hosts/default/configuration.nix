@@ -1,7 +1,6 @@
 { config, pkgs, inputs, ... }:
 
 let
-  lib = pkgs.lib;
   # Noctalia Shell：优先使用 nixpkgs（如果存在），否则使用 flake input。
   noctaliaShellPkg =
     if pkgs ? noctalia-shell then pkgs.noctalia-shell
@@ -9,11 +8,9 @@ let
 
   # Rime 方案数据（雾凇拼音 / rime-ice 等）。
   # 某些渠道/版本的 nixpkgs 里可能没有这些属性，所以这里做了兼容。
-  rimeDataPkg = if builtins.hasAttr "rime-data" pkgs then pkgs."rime-data" else null;
-  rimeIcePkg = if builtins.hasAttr "rime-ice" pkgs then pkgs."rime-ice" else null;
-  rimeSchemaPkgs = builtins.filter (p: p != null) [ rimeDataPkg rimeIcePkg ];
-  rimeSchemaDirs = map (p: "${p}/share/rime-data") rimeSchemaPkgs;
-  rimeSchemaDirsQuoted = lib.concatStringsSep " " (map (d: "\"${d}\"") rimeSchemaDirs);
+  # rimeDataPkg = if builtins.hasAttr "rime-data" pkgs then pkgs."rime-data" else null;
+  # rimeIcePkg = if builtins.hasAttr "rime-ice" pkgs then pkgs."rime-ice" else null;
+  # rimeSchemaPkgs = builtins.filter (p: p != null) [ rimeDataPkg rimeIcePkg ];
 
   # 让 Chrome 在 Wayland 下也能正常使用输入法（KDE Wayland 常见问题）。
   # 说明：用 symlinkJoin + wrapProgram 保留 .desktop 文件（否则 App Launcher 扫不到 Chrome）。
@@ -103,6 +100,7 @@ in
     fi
     chown -hR "$user:users" "$homeDir/.config" 2>/dev/null || true
   '';
+
   # --- 1. 启动与内核 ---
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
@@ -131,9 +129,7 @@ in
   # --- 3. 显卡驱动 (NVIDIA) ---
   services.xserver.videoDrivers = [ "nvidia" ];
   hardware.graphics.enable = true;
-  hardware.graphics.enable32Bit = true;
-  hardware.graphics.extraPackages = with pkgs; [ vulkan-tools ];
-  hardware.graphics.extraPackages32 = with pkgs; [ vulkan-tools ];
+  hardware.graphics.enable32Bit = true; # 支持 32 位应用
   hardware.nvidia = {
     modesetting.enable = true;
     powerManagement.enable = false; 
@@ -141,8 +137,7 @@ in
     nvidiaSettings = true;
     package = config.boot.kernelPackages.nvidiaPackages.beta; 
   };
-  hardware.opengl.enable = true;
-  hardware.opengl.driSupport32Bit = true;
+
   # --- 4. 桌面环境与登录器 ---
   # SDDM 登录管理器 (支持 Wayland)
   services.displayManager.sddm = {
@@ -190,7 +185,7 @@ in
   };
 
   # --- 8. 系统级开发环境 & 工具 ---
-  environment.systemPackages = (with pkgs; [
+  environment.systemPackages = with pkgs; [
     # 核心工具
     git
     wget
@@ -280,8 +275,10 @@ in
 
     # 输入法配置等工具
     qt6Packages.fcitx5-configtool
+    rime-ice
 
-    # 文件/媒
+    # 文件/媒体
+    nautilus
     file-roller
     mpv
     imv
@@ -306,7 +303,7 @@ in
     # Steam 相关
     steam-run           # 运行非 Steam 游戏
     protontricks        # Proton 配置工具
-    xwayland-satellite # 改善 Steam/Proton 在 Wayland 下的兼容性
+    xwayland-satellite # 让 Proton 在 Wayland 下更稳定运行的辅助工具 
     # 游戏启动器
     # lutris              # 游戏启动器
     # heroic              # Epic/GOG 启动器
@@ -322,7 +319,7 @@ in
     
     # 手柄支持
     antimicrox          # 手柄映射
-  ]) ++ rimeSchemaPkgs;
+  ];
 
   # --- 9. Zsh ---
   programs.zsh = {
@@ -471,7 +468,6 @@ in
 
     # 优先使用简体中文翻译（避免某些组件默认落到繁体翻译）
     LANGUAGE = "zh_CN:en_US";
-    DISPLAY = ":23";  # 默认 Wayland 显示服务器
   };
 
   # Wayland Portal（让 Wayland 应用与桌面集成更稳定；Noctalia 部分功能也会用到）
@@ -509,7 +505,7 @@ in
   };
   
   # 保留系统版本数量 (boot menu 中显示的版本数)
-  boot.loader.systemd-boot.configurationLimit = 3;
+  boot.loader.systemd-boot.configurationLimit = 5;
   
   nixpkgs.config.allowUnfree = true;
 
