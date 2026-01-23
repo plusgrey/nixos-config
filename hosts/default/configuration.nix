@@ -276,6 +276,7 @@ in
     gh
     zoxide
     atuin
+    chafa
 
     # 终端/桌面应用（配置由 dotfiles 自己管）
     wezterm
