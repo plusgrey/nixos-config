@@ -201,7 +201,7 @@ in
       fcitx5-fluent
       librime
       librime-lua
-      fcitx5-rime
+      # fcitx5-rime
       pkgs.rime-ice
     ];
     fcitx5.waylandFrontend = true;
@@ -386,6 +386,18 @@ in
     xorg.libXcursor
     xorg.libXi
     xorg.libXrandr
+    # 深度学习必备
+    linuxPackages.nvidia_x11  # 提供 libcuda.so
+    libglvnd                  # 现代 GL 供应商中立库
+    stdenv.cc.cc.lib          # 关键：提供标准 C++ 库支持
+    glib
+    binutils                  # 提供 ld 等工具
+    
+    # 常见依赖
+    libxcrypt-legacy          # 某些旧版动态链接需要
+    ncurses
+    freeglut
+    libthpool
   ];
 
   # --- 11. 游戏支持 ---
@@ -431,7 +443,9 @@ in
   virtualisation.docker = {
     enable = true;
     enableOnBoot = false;  # 需要时启动
+    enableNvidia = true; # 支持 Nvidia GPU 加速
   };
+  hardware.nvidia-container-toolkit.enable = true;
 
   # --- 17. 字体配置 ---
   fonts = {
@@ -498,6 +512,7 @@ in
 
     # 优先使用简体中文翻译（避免某些组件默认落到繁体翻译）
     LANGUAGE = "zh_CN:en_US";
+    LD_LIBRARY_PATH = "/run/opengl-driver/lib:/run/opengl-driver-32/lib";
   };
 
   # Wayland Portal（让 Wayland 应用与桌面集成更稳定；Noctalia 部分功能也会用到）
