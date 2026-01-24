@@ -259,6 +259,7 @@ in
     # 终端工具
     # starship   # 提示符 (已在 dotfiles 中使用 zim 自带主题)
     tmux
+    zimfw  # Zim 框架管理器
 
     # dotfiles 相关依赖（仅提供命令/运行时，不管理配置文件内容）
     fzf
