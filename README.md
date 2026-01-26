@@ -157,12 +157,12 @@ nmcli device wifi connect "你的WiFi" password "密码"
 mkdir -p ~/Projects
 cd ~/Projects
 
-# 克隆你的 nix-config
-git clone https://github.com/你的用户名/nix-config.git
+# 克隆 nix-config
+git clone git@github.com:plusgrey/nixos-config.git
 
 # 克隆 dotfiles
 mkdir -p ~/dotfiles
-git clone https://github.com/你的用户名/dotfiles.git ~/dotfiles
+git clone https://github.com/plusgrey/dotfiles.git ~/dotfiles
 ```
 
 应用 Nix 配置后，再执行你的 dotfiles 安装/链接流程（例如）：
