@@ -328,6 +328,4 @@ Noctalia Shell 目前可能需要手动安装或从 AUR/Flake 获取：
 - **Git**: Git + Delta + Lazygit + GitHub CLI
 - **文件管理**: Yazi, Nautilus
 - **工具**: Btop, Bat, Eza, Fzf, Ripgrep, Fd, Zoxide
-- **浏览器**: Firefox, Chrome
-
-享受你的 NixOS 之旅！🎉
+- **浏览器**: Zen, Chrome
