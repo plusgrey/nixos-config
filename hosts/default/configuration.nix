@@ -131,6 +131,7 @@ in
     "en_US.UTF-8/UTF-8"
     "zh_CN.UTF-8/UTF-8"
   ];
+  services.openssh.enable = true;
 
   # --- 3. 显卡驱动 (NVIDIA) ---
   services.xserver.videoDrivers = [ "nvidia" ];
@@ -252,6 +253,8 @@ in
     # 文件系统
     ntfs3g
     exfat
+    direnv
+    nix-direnv
 
     # Pixi
     pixi
@@ -348,6 +351,10 @@ in
     # 手柄支持
     antimicrox          # 手柄映射
   ];
+
+  # 必须启用程序级配置来初始化 hook
+  programs.direnv.enable = true;
+  programs.direnv.nix-direnv.enable = true;
 
   # --- 9. Zsh ---
   programs.zsh = {
