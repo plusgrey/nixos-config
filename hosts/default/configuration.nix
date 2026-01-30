@@ -399,7 +399,6 @@ in
     libxcrypt-legacy          # 某些旧版动态链接需要
     ncurses
     freeglut
-    libthpool
   ];
 
   # --- 11. 游戏支持 ---
@@ -514,7 +513,7 @@ in
 
     # 优先使用简体中文翻译（避免某些组件默认落到繁体翻译）
     LANGUAGE = "zh_CN:en_US";
-    LD_LIBRARY_PATH = "/run/opengl-driver/lib:/run/opengl-driver-32/lib";
+    #LD_LIBRARY_PATH = "/run/opengl-driver/lib:/run/opengl-driver-32/lib";
   };
 
   # Wayland Portal（让 Wayland 应用与桌面集成更稳定；Noctalia 部分功能也会用到）
