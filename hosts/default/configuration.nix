@@ -121,11 +121,11 @@ in
 
   # 只影响“界面消息”语言（不强制改变日期/数字等格式），
   # 用于避免 fcitx5 之类组件默认落到繁体翻译。
-  i18n.extraLocaleSettings = {
-    LC_MESSAGES = "zh_CN.UTF-8";
-    LC_CTYPE = "zh_CN.UTF-8";
-  };
-
+  # i18n.extraLocaleSettings = {
+  #   LC_MESSAGES = "zh_CN.UTF-8";
+  #   LC_CTYPE = "zh_CN.UTF-8";
+  # };
+  #
   # 额外的语言支持
   i18n.supportedLocales = [
     "en_US.UTF-8/UTF-8"
@@ -519,7 +519,7 @@ in
     # 对于 KDE Plasma，不需要手动设置 DISPLAY
 
     # 优先使用简体中文翻译（避免某些组件默认落到繁体翻译）
-    LANGUAGE = "en_US:zh_CN";
+    LANGUAGE = "en_US";
     #LD_LIBRARY_PATH = "/run/opengl-driver/lib:/run/opengl-driver-32/lib";
   };
 
