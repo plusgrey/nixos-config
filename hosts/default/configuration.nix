@@ -139,7 +139,7 @@ in
   hardware.graphics.enable32Bit = true; # 支持 32 位应用
   hardware.nvidia = {
     modesetting.enable = true;
-    powerManagement.enable = false;
+    powerManagement.enable = true;
     open = false;
     nvidiaSettings = true;
     package = config.boot.kernelPackages.nvidiaPackages.beta;
@@ -451,7 +451,6 @@ in
   virtualisation.docker = {
     enable = true;
     enableOnBoot = false;  # 需要时启动
-    enableNvidia = true; # 支持 Nvidia GPU 加速
   };
   hardware.nvidia-container-toolkit.enable = true;
 
