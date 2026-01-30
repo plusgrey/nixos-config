@@ -101,7 +101,7 @@ in
   # --- 1. 启动与内核 ---
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-  
+
   # 使用最新内核（而不是默认的 LTS 内核）
   # 原因：获取最新硬件支持和功能
   # 可选值：
@@ -109,12 +109,12 @@ in
   #   pkgs.linuxPackages_zen     - Zen 内核（游戏优化）
   #   pkgs.linuxPackages_xanmod  - XanMod 内核（性能优化）
   boot.kernelPackages = pkgs.linuxPackages_zen;
-  
+
   # Nvidia 必选参数，防止画面撕裂和 Wayland 问题
   boot.kernelParams = [ "nvidia-drm.modeset=1" ];
 
   # --- 2. 网络与基础 ---
-  networking.hostName = "nix"; 
+  networking.hostName = "nix";
   networking.networkmanager.enable = true;
   time.timeZone = "Asia/Singapore";
   i18n.defaultLocale = "en_US.UTF-8";
@@ -138,10 +138,10 @@ in
   hardware.graphics.enable32Bit = true; # 支持 32 位应用
   hardware.nvidia = {
     modesetting.enable = true;
-    powerManagement.enable = false; 
-    open = false; 
+    powerManagement.enable = false;
+    open = false;
     nvidiaSettings = true;
-    package = config.boot.kernelPackages.nvidiaPackages.beta; 
+    package = config.boot.kernelPackages.nvidiaPackages.beta;
   };
 
   # --- 4. 桌面环境与登录器 ---
@@ -151,7 +151,7 @@ in
     wayland.enable = true;
     # 如果想用默认主题以外的，可以在这里配置 theme
   };
-  
+
   # KDE Plasma 6 (作为备用/第二桌面)
   services.desktopManager.plasma6.enable = true;
 
@@ -201,7 +201,7 @@ in
       fcitx5-fluent
       librime
       librime-lua
-      # fcitx5-rime
+      fcitx5-rime
       pkgs.rime-ice
     ];
     fcitx5.waylandFrontend = true;
@@ -232,30 +232,30 @@ in
     tree
     which
     file
-    
+
     # 语言基础环境 (用于非 Project 的随手开发)
     python3
     rustup
     nodejs
     go
     lua-language-server
-    
+
     # 系统监控
     btop
     fastfetch
-    
+
     # 网络工具
     inetutils
     dnsutils
     nmap
-    
+
     # 文件系统
     ntfs3g
     exfat
-    
-    # Pixi 
+
+    # Pixi
     pixi
-    
+
     # 终端工具
     # starship   # 提示符 (已在 dotfiles 中使用 zim 自带主题)
     tmux
@@ -318,33 +318,33 @@ in
     nwg-look
     qt6Packages.qt6ct
     papirus-icon-theme
-    
+
     # Noctalia Shell（二选一来源：nixpkgs 或 flake input）
     noctaliaShellPkg
-    
+
     # 其他实用工具
     mediainfo
     imagemagick
     ffmpeg
-    
+
     # --- 游戏工具 ---
     # Steam 相关
     steam-run           # 运行非 Steam 游戏
     protontricks        # Proton 配置工具
-    xwayland-satellite # 让 Proton 在 Wayland 下更稳定运行的辅助工具 
+    xwayland-satellite # 让 Proton 在 Wayland 下更稳定运行的辅助工具
     # 游戏启动器
     # lutris              # 游戏启动器
     # heroic              # Epic/GOG 启动器
     prismlauncher       # Minecraft 启动器
-    
+
     # 性能监控
     mangohud            # 游戏内性能监控 OSD
     goverlay            # MangoHud 配置工具
-    
+
     # Wine/Proton
     wine64              # Wine 64位
     winetricks          # Wine 配置工具
-    
+
     # 手柄支持
     antimicrox          # 手柄映射
   ];
@@ -394,7 +394,7 @@ in
     stdenv.cc.cc.lib          # 关键：提供标准 C++ 库支持
     glib
     binutils                  # 提供 ld 等工具
-    
+
     # 常见依赖
     libxcrypt-legacy          # 某些旧版动态链接需要
     ncurses
@@ -419,7 +419,7 @@ in
     jack.enable = true;
     wireplumber.enable = true;
   };
-  
+
   # 禁用 PulseAudio (使用 PipeWire 替代)
   services.pulseaudio.enable = false;
 
@@ -436,7 +436,7 @@ in
   # --- 15. 安全和权限 ---
   security.rtkit.enable = true;  # 用于 PipeWire
   security.polkit.enable = true;
-  
+
   # sudo 无密码 (可选，开发方便)
   # security.sudo.wheelNeedsPassword = false;
 
@@ -500,9 +500,9 @@ in
     # Wayland
     NIXOS_OZONE_WL = "1";
     WLR_NO_HARDWARE_CURSORS = "1";
-    
+
     # 输入法
-    GTK_IM_MODULE = "fcitx";
+    #GTK_IM_MODULE = "fcitx";
     QT_IM_MODULE = "fcitx";
     XMODIFIERS = "@im=fcitx";
     SDL_IM_MODULE = "fcitx";
@@ -512,7 +512,7 @@ in
     # 对于 KDE Plasma，不需要手动设置 DISPLAY
 
     # 优先使用简体中文翻译（避免某些组件默认落到繁体翻译）
-    LANGUAGE = "zh_CN:en_US";
+    LANGUAGE = "en_US:zh_CN";
     #LD_LIBRARY_PATH = "/run/opengl-driver/lib:/run/opengl-driver-32/lib";
   };
 
@@ -530,7 +530,7 @@ in
     settings = {
       experimental-features = [ "nix-command" "flakes" ];
       auto-optimise-store = true;
-      
+
       # nix-community 缓存 (加速社区包下载)
       substituters = [
         "https://cache.nixos.org"
@@ -541,7 +541,7 @@ in
         "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
       ];
     };
-    
+
     # 定期垃圾回收 (保留最近3个版本和7天内的版本)
     gc = {
       automatic = true;
@@ -549,11 +549,11 @@ in
       options = "--delete-older-than 7d";
     };
   };
-  
+
   # 保留系统版本数量 (boot menu 中显示的版本数)
   boot.loader.systemd-boot.configurationLimit = 5;
-  
+
   nixpkgs.config.allowUnfree = true;
 
-  system.stateVersion = "25.11"; 
+  system.stateVersion = "25.11";
 }
