@@ -16,12 +16,17 @@
       url = "github:noctalia-dev/noctalia-shell";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    zen-browser = {
+      url = "github:youwen5/zen-browser-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, nixpkgs-stable, niri, ... }@inputs: 
+  outputs = { self, nixpkgs, nixpkgs-stable, niri, ... }@inputs:
   let
     system = "x86_64-linux";
-    
+
     # 导入稳定版 pkgs
     pkgs-stable = import nixpkgs-stable {
       inherit system;
@@ -33,8 +38,8 @@
       # 主机名定义为 nix (与 configuration.nix 中 networking.hostName 匹配)
       nix = nixpkgs.lib.nixosSystem {
         inherit system;
-        specialArgs = { 
-          inherit inputs pkgs-stable; 
+        specialArgs = {
+          inherit inputs pkgs-stable;
         };
         modules = [
           ./hosts/default/configuration.nix

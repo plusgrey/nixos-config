@@ -287,6 +287,7 @@ in
     googleChromeIme
     vscode
     insomnia
+    inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
 
     # Wayland & 桌面常用工具
     wlr-randr
