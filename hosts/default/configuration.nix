@@ -405,6 +405,8 @@ in
     stdenv.cc.cc
     stdenv.cc.cc.lib
     glibc
+    libz
+    libgcc
 
     # === 压缩和编码库 ===
     zlib
@@ -453,6 +455,7 @@ in
     libxcrypt-legacy
     readline
     sqlite
+
 
     # === 数学和科学计算库 ===
     openblas
