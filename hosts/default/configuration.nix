@@ -6,14 +6,6 @@ let
     if pkgs ? noctalia-shell then pkgs.noctalia-shell
     else inputs.noctalia-shell.packages.${pkgs.system}.default;
 
-  # Rime 方案数据（雾凇拼音 / rime-ice 等）。
-  # 某些渠道/版本的 nixpkgs 里可能没有这些属性，所以这里做了兼容。
-  # rimeDataPkg = if builtins.hasAttr "rime-data" pkgs then pkgs."rime-data" else null;
-  # rimeIcePkg = if builtins.hasAttr "rime-ice" pkgs then pkgs."rime-ice" else null;
-  # rimeSchemaPkgs = builtins.filter (p: p != null) [ rimeDataPkg rimeIcePkg ];
-
-  # 让 Chrome 在 Wayland 下也能正常使用输入法（KDE Wayland 常见问题）。
-  # 说明：用 symlinkJoin + wrapProgram 保留 .desktop 文件（否则 App Launcher 扫不到 Chrome）。
 googleChromeIme = pkgs.symlinkJoin {
     name = "google-chrome-ime";
     paths = [ pkgs.google-chrome ];
@@ -226,6 +218,8 @@ in
     gnumake
     gcc
     cmake
+    pkg-config
+    gdb
 
     # 搜索工具
     ripgrep
@@ -380,33 +374,125 @@ in
   # --- 10. Nix-ld (解决二进制兼容性) ---
   programs.nix-ld.enable = true;
   programs.nix-ld.libraries = with pkgs; [
+    # stdenv.cc.cc
+    # zlib
+    # fuse3
+    # icu
+    # nss
+    # openssl
+    # curl
+    # expat
+    # libxml2
+    # # 常见的 Python/Node 本地构建需要的库
+    # libGL
+    # libGLU
+    # xorg.libX11
+    # xorg.libXcursor
+    # xorg.libXi
+    # xorg.libXrandr
+    # # 深度学习必备
+    # linuxPackages.nvidia_x11  # 提供 libcuda.so
+    # libglvnd                  # 现代 GL 供应商中立库
+    # stdenv.cc.cc.lib          # 关键：提供标准 C++ 库支持
+    # glib
+    # binutils                  # 提供 ld 等工具
+    #
+    # # 常见依赖
+    # libxcrypt-legacy          # 某些旧版动态链接需要
+    # ncurses
+    # freeglut
+      # === 基础 C/C++ 运行时 ===
     stdenv.cc.cc
+    stdenv.cc.cc.lib
+    glibc
+
+    # === 压缩和编码库 ===
     zlib
-    fuse3
-    icu
-    nss
+    zstd
+    bzip2
+    xz
+
+    # === SSL/网络库 ===
     openssl
     curl
+    libssh
+    nghttp2
+
+    # === XML/解析库 ===
     expat
     libxml2
-    # 常见的 Python/Node 本地构建需要的库
+    libxslt
+
+    # === 图形和窗口系统 ===
     libGL
     libGLU
+    libglvnd
+    mesa
+
+    # === X11 相关 ===
     xorg.libX11
     xorg.libXcursor
     xorg.libXi
     xorg.libXrandr
-    # 深度学习必备
-    linuxPackages.nvidia_x11  # 提供 libcuda.so
-    libglvnd                  # 现代 GL 供应商中立库
-    stdenv.cc.cc.lib          # 关键：提供标准 C++ 库支持
-    glib
-    binutils                  # 提供 ld 等工具
+    xorg.libXext
+    xorg.libXrender
+    xorg.libxcb
+    xorg.libXfixes
 
-    # 常见依赖
-    libxcrypt-legacy          # 某些旧版动态链接需要
+    # === NVIDIA/CUDA 支持 ===
+    linuxPackages.nvidia_x11
+    cudatoolkit
+    cudaPackages.cudnn
+    cudaPackages.nccl
+
+    # === Python 二进制扩展常用库 ===
+    fuse3
+    icu
+    nss
     ncurses
+    libxcrypt-legacy
+    readline
+    sqlite
+
+    # === 数学和科学计算库 ===
+    openblas
+    lapack
+    # Intel MKL (如果需要更好的性能)
+    mkl
+
+    # === 图像处理 ===
+    libjpeg
+    libpng
+    libtiff
+    libwebp
+
+    # === 音视频 ===
+    ffmpeg
+    gst_all_1.gstreamer
+    gst_all_1.gst-plugins-base
+
+    # === 其他常用库 ===
+    glib
+    binutils
     freeglut
+    libffi
+    libuuid
+    attr
+    libcap
+
+    # === 添加 Python 特定的依赖 ===
+    # 这些是 PyTorch 和其他科学计算包常需要的
+    numactl
+    libaio
+    rdma-core
+
+    # === 网络下载相关（解决 UV/pip 下载问题）===
+    cacert
+    openssl.dev
+    krb5
+    keyutils
+    libev
+    c-ares
   ];
 
   # --- 11. 游戏支持 ---
@@ -517,10 +603,22 @@ in
     # 注意：DISPLAY 环境变量不在这里设置
     # 对于 Niri，在 niri config.kdl 的 environment 块中设置 DISPLAY=":0"
     # 对于 KDE Plasma，不需要手动设置 DISPLAY
+    CUDA_PATH = "${pkgs.cudatoolkit}";
 
+    # 某些 Python 包需要知道 OpenBLAS 的位置
+    OPENBLAS = "${pkgs.openblas}";
+
+    # SSL 证书路径
+    SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
+    CURL_CA_BUNDLE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
     # 优先使用简体中文翻译（避免某些组件默认落到繁体翻译）
     LANGUAGE = "en_US";
     #LD_LIBRARY_PATH = "/run/opengl-driver/lib:/run/opengl-driver-32/lib";
+      # === Rust OpenSSL 支持 ===
+    OPENSSL_DIR = "${pkgs.openssl.dev}";
+    OPENSSL_LIB_DIR = "${pkgs.openssl.out}/lib";
+    OPENSSL_INCLUDE_DIR = "${pkgs.openssl.dev}/include";
+    PKG_CONFIG_PATH = "${pkgs.openssl.dev}/lib/pkgconfig";
   };
 
   # Wayland Portal（让 Wayland 应用与桌面集成更稳定；Noctalia 部分功能也会用到）
