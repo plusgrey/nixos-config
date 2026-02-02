@@ -278,6 +278,10 @@ sudo nixos-rebuild switch --rollback
     └── yazi/
 ```
 
+### 雾凇拼音
+下载对应repo中的所有文件：https://github.com/iDvel/rime-ice
+解压到`~/.local/share/fcitx5/rime`中
+
 ### Noctalia Shell
 
 Noctalia Shell 目前可能需要手动安装或从 AUR/Flake 获取：
