@@ -231,6 +231,10 @@ in
     # 语言基础环境 (用于非 Project 的随手开发)
     python3
     rustup
+    cargo
+    rustc
+    clang-tools
+    clang
     nodejs
     go
     lua-language-server
