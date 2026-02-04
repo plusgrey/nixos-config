@@ -569,6 +569,9 @@ in
     ];
   };
 
+  #Flatpak 支持（可选）
+  services.flatpak.enable = true;
+
   # --- 图标主题（Papirus）---
   # GTK 会从 xdg settings.ini 读取默认 icon theme。
   environment.etc."xdg/gtk-3.0/settings.ini".text = ''
