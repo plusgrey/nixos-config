@@ -82,6 +82,7 @@ in
     backup_and_link "$homeDir/.config/wezterm" "$dotfilesDir/.config/wezterm"
     backup_and_link "$homeDir/.config/niri"     "$dotfilesDir/.config/niri"
     backup_and_link "$homeDir/.config/noctalia" "$dotfilesDir/.config/noctalia"
+    backup_and_link "$homeDir/.config/ghostty" "$dotfilesDir/.config/ghostty"
 
     # tmux 主题/脚本常通过 run-shell 直接执行，确保有可执行权限
     if [ -d "$homeDir/.config/tmux/scripts" ]; then
@@ -121,7 +122,7 @@ in
   # 额外的语言支持
   i18n.supportedLocales = [
     "en_US.UTF-8/UTF-8"
-    "zh_CN.UTF-8/UTF-8"
+    # "zh_CN.UTF-8/UTF-8"
   ];
   services.openssh.enable = true;
 
@@ -282,6 +283,7 @@ in
 
     # 终端/桌面应用（配置由 dotfiles 自己管）
     wezterm
+    ghostty
     googleChromeIme
     vscode
     insomnia
