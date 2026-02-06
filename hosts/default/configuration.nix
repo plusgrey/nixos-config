@@ -226,6 +226,7 @@ in
     nodejs
     go
     lua-language-server
+    tree-sitter
 
     # 系统监控
     btop
