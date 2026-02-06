@@ -6,22 +6,6 @@ let
     if pkgs ? noctalia-shell then pkgs.noctalia-shell
     else inputs.noctalia-shell.packages.${pkgs.system}.default;
 
-googleChromeIme = pkgs.symlinkJoin {
-    name = "google-chrome-ime";
-    paths = [ pkgs.google-chrome ];
-    nativeBuildInputs = [ pkgs.makeWrapper ];
-    postBuild = ''
-      for bin in "$out/bin/google-chrome-stable" "$out/bin/google-chrome"; do
-        if [ -x "$bin" ]; then
-          # 修改点：增加了 --gtk-version=4
-          # 这会强制 Chrome 使用 GTK4 的输入法上下文逻辑，通常能修复 KDE 下的 Fcitx5 问题
-          wrapProgram "$bin" \
-            --add-flags "--enable-wayland-ime --ozone-platform-hint=auto --gtk-version=4"
-        fi
-      done
-    '';
-  };
-
 in
 {
   imports = [
@@ -284,7 +268,7 @@ in
     # 终端/桌面应用（配置由 dotfiles 自己管）
     wezterm
     ghostty
-    googleChromeIme
+    google-chrome
     vscode
     insomnia
     inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
