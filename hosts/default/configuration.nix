@@ -122,12 +122,12 @@ in
     package = config.boot.kernelPackages.nvidiaPackages.beta;
   };
 
-  # --- 4. 桌面环境与登录器 ---
+# --- 4. 桌面环境与登录器 ---
   # SDDM 登录管理器 (支持 Wayland)
   services.displayManager.sddm = {
     enable = true;
     wayland.enable = true;
-    # 如果想用默认主题以外的，可以在这里配置 theme
+    theme = "breeze";
   };
 
   # KDE Plasma 6 (作为备用/第二桌面)
@@ -205,6 +205,9 @@ in
     cmake
     pkg-config
     gdb
+    readline
+    lua5_1
+    lua51Packages.luarocks
 
     # 搜索工具
     ripgrep
@@ -260,7 +263,7 @@ in
     bat
     eza
     lazygit
-    gh
+    # gh
     zoxide
     atuin
     chafa
@@ -647,7 +650,7 @@ in
     gc = {
       automatic = true;
       dates = "weekly";
-      options = "--delete-older-than 7d";
+      options = "--delete-older-than 30d";
     };
   };
 
