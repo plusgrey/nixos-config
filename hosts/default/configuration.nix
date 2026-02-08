@@ -273,6 +273,7 @@ in
     wezterm
     ghostty
     google-chrome
+    # vscode.override {commandLineArgs = [ "--enable-features=UseOzonePlatform --ozone-platform=wayland" ];}
     vscode
     insomnia
     inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
@@ -627,7 +628,13 @@ in
     wlr.enable = true;
     extraPortals = with pkgs; [
       xdg-desktop-portal-gtk
+      kdePackages.xdg-desktop-portal-kde
     ];
+    config = {
+      common = {
+        default =[ "gtk" "kde" ];
+      };
+    };
   };
 
   # --- 19. Nix 设置 ---
