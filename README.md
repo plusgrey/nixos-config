@@ -299,18 +299,6 @@ Noctalia Shell 目前可能需要手动安装或从 AUR/Flake 获取：
 3. **网络问题**: 确保 NetworkManager 已启用
 4. **输入法不工作**: 确保 Fcitx5 环境变量已设置，重新登录
 
----
-
-## 📚 参考资源
-
-- [NixOS Manual](https://nixos.org/manual/nixos/stable/)
-- [Home Manager Manual](https://nix-community.github.io/home-manager/)
-- [Nix Pills](https://nixos.org/guides/nix-pills/)
-- [NixOS Wiki](https://wiki.nixos.org/)
-- [Niri Window Manager](https://github.com/YaLTeR/niri)
-
----
-
 ## 🎯 配置包含的软件
 
 ### 系统级
